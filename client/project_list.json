@@ -1,0 +1,84 @@
+{
+  "projects": [
+    {
+      "ide": "IdeaIC2024.2",
+      "project_name": "Minecraft Modding",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding projects\\Minecraft Modding",
+      "status": "Not a Git Repository",
+      "branch": null,
+      "remote_url": null
+    },
+    {
+      "ide": "IdeaIC2024.3",
+      "project_name": "Projet2Java",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Java\\Projet2Java",
+      "status": "Git Connected",
+      "branch": "master",
+      "remote_url": "https://github.com/Frostbyte0x0/Projet2Java.git"
+    },
+    {
+      "ide": "IdeaIC2024.3",
+      "project_name": "Java",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Java",
+      "status": "Not a Git Repository",
+      "branch": null,
+      "remote_url": null
+    },
+    {
+      "ide": "IdeaIC2025.2",
+      "project_name": "Frostbite-1.21.8",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Frostbite-1.21.8",
+      "status": "Git Connected",
+      "branch": "main",
+      "remote_url": "https://github.com/oBerserk007o/Frostbite-1.21.4.git"
+    },
+    {
+      "ide": "IntelliJIdea2025.3",
+      "project_name": "Resonance",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Resonance",
+      "status": "Git Connected",
+      "branch": "main",
+      "remote_url": "https://github.com/Frostbyte0x0/Resonance.git"
+    },
+    {
+      "ide": "IntelliJIdea2025.3",
+      "project_name": "Minecraft Modding",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding",
+      "status": "Not a Git Repository",
+      "branch": null,
+      "remote_url": null
+    },
+    {
+      "ide": "PyCharm2025.3",
+      "project_name": "KinovaClient",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\KinovaClient",
+      "status": "Git Connected",
+      "branch": "master",
+      "remote_url": "https://github.com/Frostbyte0x0/KinovaClient.git"
+    },
+    {
+      "ide": "PyCharm2025.3",
+      "project_name": "Python",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python",
+      "status": "Not a Git Repository",
+      "branch": null,
+      "remote_url": null
+    },
+    {
+      "ide": "PyCharm2026.1",
+      "project_name": "Tempo",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\Tempo",
+      "status": "Git Connected",
+      "branch": "master",
+      "remote_url": "https://github.com/Frostbyte0x0/Tempo.git"
+    },
+    {
+      "ide": "PyCharmCE2025.1",
+      "project_name": "Modding_Helper",
+      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Modding_Helper",
+      "status": "Git Connected",
+      "branch": "master",
+      "remote_url": "https://github.com/Frostbyte0x0/NeoModdingHelper.git"
+    }
+  ]
+}

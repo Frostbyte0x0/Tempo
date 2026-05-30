@@ -1,5 +1,3 @@
-import time
-
 import psutil
 import pygetwindow as gw
 import win32gui
@@ -37,17 +35,3 @@ def get_active_jetbrains_project():
         pass
 
     return "IDE Open (Background)", None
-
-
-# Continuous tracking loop
-print("Monitoring JetBrains status... (Press Ctrl+C to exit)")
-last_state = None
-while True:
-    state, project = get_active_jetbrains_project()
-    current_state = f"{state} | Active Project: {project}" if project else state
-
-    if current_state != last_state:
-        print(f"[{time.strftime('%H:%M:%S')}] {current_state}")
-        last_state = current_state
-
-    time.sleep(1)

@@ -85,29 +85,10 @@ def get_active_projects_with_git():
                                 aggregated_results.append({
                                     "ide": ide_dir.name,
                                     "project_name": os.path.basename(path_str),
-                                    "local_path": path_str,
+                                    "local_path": path_str.replace("/", "\\"),
                                     **git_data
                                 })
         except Exception:
             continue
 
     return aggregated_results
-
-
-# Execute combined diagnostic tool
-project_reports = get_active_projects_with_git()
-
-if project_reports:
-    for idx, report in enumerate(project_reports, 1):
-        print(f"--- [Active Project #{idx}] ---")
-        print(f"Target IDE:    {report['ide']}")
-        print(f"Project Name:  {report['project_name']}")
-        print(f"Local Path:    {report['local_path']}")
-        print(f"Git Status:    {report['status']}")
-        if report['branch']:
-            print(f"Active Branch: {report['branch']}")
-        if report['remote_url']:
-            print(f"Remote URL:    {report['remote_url']}")
-        print()
-else:
-    print("Could not find any active projects tracked in JetBrains configs.")

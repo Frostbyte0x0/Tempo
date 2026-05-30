@@ -1,0 +1,79 @@
+2026-05-29 20:59:19 [DEBUG] root: This is a debug message
+2026-05-29 20:59:19 [INFO] root: This is an info message
+2026-05-29 20:59:19 [WARNING] root: This is a warning message
+2026-05-29 20:59:19 [ERROR] root: This is an error message
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #1] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    IdeaIC2024.2
+2026-05-29 20:59:19 [INFO] root: Project Name:  Minecraft Modding
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding projects\Minecraft Modding
+2026-05-29 20:59:19 [INFO] root: Git Status:    Not a Git Repository
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #2] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    IdeaIC2024.3
+2026-05-29 20:59:19 [INFO] root: Project Name:  Projet2Java
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Java\Projet2Java
+2026-05-29 20:59:19 [INFO] root: Git Status:    Git Connected
+2026-05-29 20:59:19 [INFO] root: Active Branch: master
+2026-05-29 20:59:19 [INFO] root: Remote URL:    https://github.com/Frostbyte0x0/Projet2Java.git
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #3] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    IdeaIC2024.3
+2026-05-29 20:59:19 [INFO] root: Project Name:  Java
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Java
+2026-05-29 20:59:19 [INFO] root: Git Status:    Not a Git Repository
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #4] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    IdeaIC2025.2
+2026-05-29 20:59:19 [INFO] root: Project Name:  Frostbite-1.21.8
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Minecraft Modding\Frostbite-1.21.8
+2026-05-29 20:59:19 [INFO] root: Git Status:    Git Connected
+2026-05-29 20:59:19 [INFO] root: Active Branch: main
+2026-05-29 20:59:19 [INFO] root: Remote URL:    https://github.com/oBerserk007o/Frostbite-1.21.4.git
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #5] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    IntelliJIdea2025.3
+2026-05-29 20:59:19 [INFO] root: Project Name:  Resonance
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Minecraft Modding\Resonance
+2026-05-29 20:59:19 [INFO] root: Git Status:    Git Connected
+2026-05-29 20:59:19 [INFO] root: Active Branch: main
+2026-05-29 20:59:19 [INFO] root: Remote URL:    https://github.com/Frostbyte0x0/Resonance.git
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #6] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    IntelliJIdea2025.3
+2026-05-29 20:59:19 [INFO] root: Project Name:  Minecraft Modding
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Minecraft Modding
+2026-05-29 20:59:19 [INFO] root: Git Status:    Not a Git Repository
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #7] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    PyCharm2025.3
+2026-05-29 20:59:19 [INFO] root: Project Name:  KinovaClient
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Python\KinovaClient
+2026-05-29 20:59:19 [INFO] root: Git Status:    Git Connected
+2026-05-29 20:59:19 [INFO] root: Active Branch: master
+2026-05-29 20:59:19 [INFO] root: Remote URL:    https://github.com/Frostbyte0x0/KinovaClient.git
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #8] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    PyCharm2025.3
+2026-05-29 20:59:19 [INFO] root: Project Name:  Python
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Python
+2026-05-29 20:59:19 [INFO] root: Git Status:    Not a Git Repository
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #9] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    PyCharm2026.1
+2026-05-29 20:59:19 [INFO] root: Project Name:  Tempo
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Python\Tempo
+2026-05-29 20:59:19 [INFO] root: Git Status:    Git Connected
+2026-05-29 20:59:19 [INFO] root: Active Branch: master
+2026-05-29 20:59:19 [INFO] root: Remote URL:    https://github.com/Frostbyte0x0/Tempo.git
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [INFO] root: --- [Active Project #10] ---
+2026-05-29 20:59:19 [INFO] root: Target IDE:    PyCharmCE2025.1
+2026-05-29 20:59:19 [INFO] root: Project Name:  Modding_Helper
+2026-05-29 20:59:19 [INFO] root: Local Path:    C:\Users\Dorno\Desktop\Coding_projects\Minecraft Modding\Modding_Helper
+2026-05-29 20:59:19 [INFO] root: Git Status:    Git Connected
+2026-05-29 20:59:19 [INFO] root: Active Branch: master
+2026-05-29 20:59:19 [INFO] root: Remote URL:    https://github.com/Frostbyte0x0/NeoModdingHelper.git
+2026-05-29 20:59:19 [INFO] root: -----------------------------
+2026-05-29 20:59:19 [DEBUG] root: [20:59:19] IDE Open (Focused) | Active Project: Tempo
+2026-05-29 20:59:23 [DEBUG] root: [20:59:23] IDE Open (Background)
+2026-05-29 20:59:24 [DEBUG] root: [20:59:24] IDE Open (Focused) | Active Project: Tempo
