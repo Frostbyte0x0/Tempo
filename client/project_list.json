@@ -1,84 +1,194 @@
 {
-  "projects": [
-    {
-      "ide": "IdeaIC2024.2",
-      "project_name": "Minecraft Modding",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding projects\\Minecraft Modding",
-      "status": "Not a Git Repository",
-      "branch": null,
-      "remote_url": null
-    },
-    {
-      "ide": "IdeaIC2024.3",
-      "project_name": "Projet2Java",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Java\\Projet2Java",
-      "status": "Git Connected",
-      "branch": "master",
-      "remote_url": "https://github.com/Frostbyte0x0/Projet2Java.git"
-    },
-    {
-      "ide": "IdeaIC2024.3",
-      "project_name": "Java",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Java",
-      "status": "Not a Git Repository",
-      "branch": null,
-      "remote_url": null
-    },
-    {
-      "ide": "IdeaIC2025.2",
-      "project_name": "Frostbite-1.21.8",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Frostbite-1.21.8",
-      "status": "Git Connected",
-      "branch": "main",
-      "remote_url": "https://github.com/oBerserk007o/Frostbite-1.21.4.git"
-    },
-    {
-      "ide": "IntelliJIdea2025.3",
-      "project_name": "Resonance",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Resonance",
-      "status": "Git Connected",
-      "branch": "main",
-      "remote_url": "https://github.com/Frostbyte0x0/Resonance.git"
-    },
-    {
-      "ide": "IntelliJIdea2025.3",
-      "project_name": "Minecraft Modding",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding",
-      "status": "Not a Git Repository",
-      "branch": null,
-      "remote_url": null
-    },
-    {
-      "ide": "PyCharm2025.3",
-      "project_name": "KinovaClient",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\KinovaClient",
-      "status": "Git Connected",
-      "branch": "master",
-      "remote_url": "https://github.com/Frostbyte0x0/KinovaClient.git"
-    },
-    {
-      "ide": "PyCharm2025.3",
-      "project_name": "Python",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python",
-      "status": "Not a Git Repository",
-      "branch": null,
-      "remote_url": null
-    },
-    {
-      "ide": "PyCharm2026.1",
-      "project_name": "Tempo",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\Tempo",
-      "status": "Git Connected",
-      "branch": "master",
-      "remote_url": "https://github.com/Frostbyte0x0/Tempo.git"
-    },
-    {
-      "ide": "PyCharmCE2025.1",
-      "project_name": "Modding_Helper",
-      "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Modding_Helper",
-      "status": "Git Connected",
-      "branch": "master",
-      "remote_url": "https://github.com/Frostbyte0x0/NeoModdingHelper.git"
-    }
-  ]
+  "ProjetProgJava": {
+    "ide": "IdeaIC2024.3",
+    "project_name": "ProjetProgJava",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding projects\\Minecraft Modding\\ProjetProgJava",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/ProjetProgJava.git"
+  },
+  "JavaExercises": {
+    "ide": "IdeaIC2024.3",
+    "project_name": "JavaExercises",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Java\\JavaExercises",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/exercisesJava.git"
+  },
+  "Projet2Java": {
+    "ide": "IdeaIC2024.3",
+    "project_name": "Projet2Java",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Java\\Projet2Java",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/Projet2Java.git"
+  },
+  "stellaris": {
+    "ide": "IdeaIC2025.1",
+    "project_name": "stellaris",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\stellaris",
+    "status": "Git Connected",
+    "branch": "boss",
+    "remote_url": "https://github.com/st0x0ef/stellaris.git"
+  },
+  "Projet1FX": {
+    "ide": "IdeaIC2025.2",
+    "project_name": "Projet1FX",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Java\\Projet1FX",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/Projet1FX.git"
+  },
+  "LabosFX": {
+    "ide": "IdeaIC2025.2",
+    "project_name": "LabosFX",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding projects\\LabosFX",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/LabosFX.git"
+  },
+  "Frostbite-1.21.8": {
+    "ide": "IdeaIC2025.2",
+    "project_name": "Frostbite-1.21.8",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Frostbite-1.21.8",
+    "status": "Git Connected",
+    "branch": "main",
+    "remote_url": "https://github.com/oBerserk007o/Frostbite-1.21.4.git"
+  },
+  "MiddleEarthWorldGen": {
+    "ide": "IntelliJIdea2025.3",
+    "project_name": "MiddleEarthWorldGen",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding projects\\MiddleEarthWorldGen",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/FyreByrns/MiddleEarthWorldGen.git"
+  },
+  "Resonance": {
+    "ide": "IntelliJIdea2025.3",
+    "project_name": "Resonance",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Resonance",
+    "status": "Git Connected",
+    "branch": "main",
+    "remote_url": "https://github.com/Frostbyte0x0/Resonance.git"
+  },
+  "discord_bot": {
+    "ide": "PyCharm2025.3",
+    "project_name": "discord_bot",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\discord_bot",
+    "status": "Git Connected",
+    "branch": "main",
+    "remote_url": "https://github.com/oBerserk007o/discord_bot"
+  },
+  "InternetSpeedTracker": {
+    "ide": "PyCharm2025.3",
+    "project_name": "InternetSpeedTracker",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\InternetSpeedTracker",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/oBerserk007o/InternetSpeedTracker.git"
+  },
+  "InverseKinematics": {
+    "ide": "PyCharm2025.3",
+    "project_name": "InverseKinematics",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\InverseKinematics",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/oBerserk007o/Inverse-Kinematics.git"
+  },
+  "DSA": {
+    "ide": "PyCharm2025.3",
+    "project_name": "DSA",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\DSA",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/oBerserk007o/DSA.git"
+  },
+  "TopographicNoise": {
+    "ide": "PyCharm2025.3",
+    "project_name": "TopographicNoise",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\TopographicNoise",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/TopographicNoise.git"
+  },
+  "Soundboard": {
+    "ide": "PyCharm2025.3",
+    "project_name": "Soundboard",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\Soundboard",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/oBerserk007o/Soundboard.git"
+  },
+  "PDFSimplifier": {
+    "ide": "PyCharm2025.3",
+    "project_name": "PDFSimplifier",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\PDFSimplifier",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/PDFSimplifier.git"
+  },
+  "Modding_Helper": {
+    "ide": "PyCharm2025.3",
+    "project_name": "Modding_Helper",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Minecraft Modding\\Modding_Helper",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/NeoModdingHelper.git"
+  },
+  "Snake1": {
+    "ide": "PyCharm2025.3",
+    "project_name": "Snake1",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\Snake1",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/Snake.git"
+  },
+  "Inverse-Kinematics": {
+    "ide": "PyCharm2025.3",
+    "project_name": "Inverse-Kinematics",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\Inverse-Kinematics",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/oBerserk007o/Inverse-Kinematics.git"
+  },
+  "HackGPT": {
+    "ide": "PyCharm2025.3",
+    "project_name": "HackGPT",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\HackGPT",
+    "status": "Git Connected",
+    "branch": "main",
+    "remote_url": "https://github.com/Frostbyte0x0/HackGPT.git"
+  },
+  "Chess": {
+    "ide": "PyCharm2025.3",
+    "project_name": "Chess",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\Chess",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/Chess.git"
+  },
+  "KinovaClient": {
+    "ide": "PyCharm2025.3",
+    "project_name": "KinovaClient",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\KinovaClient",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/KinovaClient.git"
+  },
+  "Tempo": {
+    "ide": "PyCharm2026.1",
+    "project_name": "Tempo",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\Python\\Tempo",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/Tempo.git"
+  },
+  "InverseKinematicsC#": {
+    "ide": "Rider2025.3",
+    "project_name": "InverseKinematicsC#",
+    "local_path": "C:\\Users\\Dorno\\Desktop\\Coding_projects\\InverseKinematicsC#",
+    "status": "Git Connected",
+    "branch": "master",
+    "remote_url": "https://github.com/Frostbyte0x0/InverseKinematics.git"
+  }
 }

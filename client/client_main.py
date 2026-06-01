@@ -19,29 +19,65 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-# Example log entries
-logging.debug("This is a debug message")
-logging.info("This is an info message")
-logging.warning("This is a warning message")
-logging.error("This is an error message")
+t = 5  # Time interval in seconds for tracking
 
 # TODO:
-# - Detect project list
-# - Scan for open IDE and project
-# - Add time in local data JSON
 # - When connected to server, send data and sync
 
 
-def detect() -> bool:
+def read_data() -> dict:
+    with open("data.json", "r") as f:
+        return json.load(f)
+
+def write_data(data: dict):
+    with open("data.json", "w") as f:
+        json.dump(data, f, indent=2)
+
+
+def increase_time(data: dict, project: str, branch: str):
+    if not project:
+        return
+
+    hour = time.strftime("%D %Hh")
+
+    if project in data:
+        data[project]["total"] += t
+
+        if branch in data[project]["per_branch"]:
+            data[project]["per_branch"][branch]["total"] += t
+
+            if hour in data[project]["per_branch"][branch]:
+                data[project]["per_branch"][branch][hour] += t
+            else:
+                data[project]["per_branch"][branch][hour] = t
+
+        else:
+            data[project]["per_branch"][branch] = {
+                "total": t
+            }
+
+    else:
+        data[project] = {
+            "total": t,
+            "per_branch": {
+                branch: {
+                    "total": t,
+                    hour: t
+                }
+            }
+        }
+
+
+def detect() -> dict[str, dict[str, str]] | None:
     # Execute combined diagnostic tool
     project_reports = get_active_projects_with_git()
 
     if project_reports:
         with open("project_list.json", "w") as f:
-            json.dump({"projects": project_reports}, f, indent=2)
+            json.dump(project_reports, f, indent=2)
             f.write("\n")
 
-        for idx, report in enumerate(project_reports, 1):
+        for idx, report in enumerate(project_reports.values(), 1):
             logging.info(f"--- [Active Project #{idx}] ---")
             logging.info(f"Target IDE:    {report['ide']}")
             logging.info(f"Project Name:  {report['project_name']}")
@@ -51,16 +87,18 @@ def detect() -> bool:
                 logging.info(f"Active Branch: {report['branch']}")
             if report['remote_url']:
                 logging.info(f"Remote URL:    {report['remote_url']}")
-            logging.info("-----------------------------")
+            logging.info("----------------------------")
 
-        return True
+        return project_reports
     else:
         logging.info("Could not find any active projects tracked in JetBrains configs.")
-    return False
+    return None
 
 
-def track():
+def track(project_reports: dict[str, dict[str, str]]):
     # Continuous tracking loop
+    data = read_data()
+
     last_state = None
     while True:
         state, project = get_active_jetbrains_project()
@@ -70,9 +108,16 @@ def track():
             logging.debug(f"{current_state}")
             last_state = current_state
 
-        time.sleep(1)
+        if project:
+            increase_time(data, project, project_reports[project]["branch"])
+            write_data(data)
+
+        time.sleep(t)
 
 
 if __name__ == "__main__":
-    detect()
-    track()
+    project_reports = detect()
+    if project_reports:
+        track(project_reports)
+    else:
+        logging.info("Could not find any active projects tracked in JetBrains configs.")

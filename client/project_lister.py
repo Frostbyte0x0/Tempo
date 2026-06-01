@@ -1,7 +1,8 @@
 import os
 import re
-import xml.etree.ElementTree as ET
 from pathlib import Path
+
+import xmltodict
 
 
 def get_git_info(project_path):
@@ -44,7 +45,7 @@ def get_git_info(project_path):
         return {"status": "Error parsing Git metadata", "branch": None, "remote_url": None}
 
 
-def get_active_projects_with_git():
+def get_active_projects_with_git() -> dict[str, dict[str, str]]:
     """Reads JetBrains metadata logs and pairs paths with local Git diagnostics."""
     if os.name == 'nt':
         config_base = Path(os.environ.get('APPDATA', '')) / "JetBrains"
@@ -54,41 +55,52 @@ def get_active_projects_with_git():
         else:
             config_base = Path.home() / ".config/JetBrains"
     else:
-        return []
+        return {}
 
     if not config_base.exists():
-        return []
+        return {}
 
     processed_paths = set()
-    aggregated_results = []
+    aggregated_results = {}
 
     for ide_dir in config_base.iterdir():
         recent_projects_xml = ide_dir / "options" / "recentProjects.xml"
+        xml_map = {}
+
         if not recent_projects_xml.exists():
-            continue
+            recent_projects_xml = ide_dir / "options" / "recentSolutions.xml"
+            if not recent_projects_xml.exists():
+                continue
 
         try:
-            tree = ET.parse(recent_projects_xml)
-            root = tree.getroot()
+            with open(recent_projects_xml) as xml_file:
+                xml_map = xmltodict.parse(xml_file.read())
+            entries = xml_map["application"]["component"]["option"][0]["map"]["entry"]
 
-            for component in root.findall(".//component[@name='RecentProjectsManager']"):
-                for option in component.findall(".//option"):
-                    if option.get('name') in ['lastProjectLocation', 'lastOpenedProject']:
-                        path_str = option.get('value')
-                        if path_str:
-                            path_str = path_str.replace("$USER_HOME$", str(Path.home()))
+            if type(entries) is not list:
+                entries = [entries]
 
-                            if path_str not in processed_paths and os.path.exists(path_str):
-                                processed_paths.add(path_str)
-                                git_data = get_git_info(path_str)
+            for entry in entries:
+                path_str = entry["@key"].replace("$USER_HOME$", str(Path.home())).replace("/", "\\")
+                if path_str.endswith(".sln"):
+                    path_str = "\\".join(entry["@key"].replace("$USER_HOME$", str(Path.home())).replace("/", "\\").split("\\")[:-1])
+                if path_str in processed_paths or not os.path.exists(path_str): continue
 
-                                aggregated_results.append({
+                processed_paths.add(path_str)
+                git_data = get_git_info(path_str)
+
+                if git_data["branch"] and git_data["remote_url"]:
+                    aggregated_results.update({
+                                    os.path.basename(path_str): {
                                     "ide": ide_dir.name,
                                     "project_name": os.path.basename(path_str),
                                     "local_path": path_str.replace("/", "\\"),
                                     **git_data
-                                })
+                                }})
         except Exception:
             continue
 
     return aggregated_results
+
+if __name__ == "__main__":
+    print(get_active_projects_with_git())

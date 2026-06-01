@@ -1,10 +1,12 @@
+import time
+
 import psutil
 import pygetwindow as gw
 import win32gui
 import win32process
 
 # Known JetBrains IDE executable names
-JETBRAINS_PROCESSES = ["pycharm64.exe", "idea64.exe", "webstorm64.exe", "clion64.exe"]
+JETBRAINS_PROCESSES = ["pycharm64.exe", "idea64.exe", "rider64.exe", "webstorm64.exe", "clion64.exe"]
 
 
 def get_active_app_name():
@@ -29,9 +31,14 @@ def get_active_jetbrains_project():
             # JetBrains windows usually format as: "project_name [path] - File.py" or contain the IDE name
             if app_name in JETBRAINS_PROCESSES:
                 # Extract project name (it is typically the first word or string before the path bracket)
-                project_name = title.split(" [")[0] if " [" in title else title.split(" – ")[0]
+                project_name = title.split(" – ")[0]
                 return "IDE Open (Focused)", project_name.strip()
     except Exception:
         pass
 
     return "IDE Open (Background)", None
+
+if __name__ == "__main__":
+    time.sleep(2)
+    print(get_active_app_name())
+    print(get_active_jetbrains_project())
