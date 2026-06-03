@@ -1,4 +1,5 @@
 import json
+import socket
 import sys
 import time
 
@@ -12,7 +13,7 @@ logging.basicConfig(
     encoding='utf-8',
     level=logging.DEBUG,
     handlers=[
-        logging.FileHandler("app.log", mode="w"),
+        logging.FileHandler("client.log", mode="w"),
         logging.StreamHandler(sys.stdout)
     ],
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -95,9 +96,21 @@ def detect() -> dict[str, dict[str, str]] | None:
     return None
 
 
+def sync(client_data):
+    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    c.connect(("localhost", 8080))
+
+    try:
+        message = json.dumps(client_data)
+        c.sendall(message.encode('utf-8'))
+    finally:
+        c.close()
+
+
 def track(project_reports: dict[str, dict[str, str]]):
     # Continuous tracking loop
     data = read_data()
+    data["device_name"] = socket.gethostname()
 
     last_state = None
     while True:
@@ -111,6 +124,8 @@ def track(project_reports: dict[str, dict[str, str]]):
         if project:
             increase_time(data, project, project_reports[project]["branch"])
             write_data(data)
+
+        sync(data)
 
         time.sleep(t)
 
