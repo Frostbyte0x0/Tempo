@@ -17,12 +17,12 @@ def get_active_app_name():
 
 
 def get_active_jetbrains_project():
-    # 1. Check if any JetBrains process is running
+    # Check if any JetBrains process is running
     ide_running = any(p.name().lower() in JETBRAINS_PROCESSES for p in psutil.process_iter())
     if not ide_running:
         return "IDE Closed", None
 
-    # 2. Extract project name from the foreground active window title
+    # Extract project name from the foreground active window title
     try:
         active_win = gw.getActiveWindow()
         if active_win and active_win.title:
@@ -30,7 +30,6 @@ def get_active_jetbrains_project():
             app_name = get_active_app_name()
             # JetBrains windows usually format as: "project_name [path] - File.py" or contain the IDE name
             if app_name in JETBRAINS_PROCESSES:
-                # Extract project name (it is typically the first word or string before the path bracket)
                 project_name = title.split(" – ")[0]
                 return "IDE Open (Focused)", project_name.strip()
     except Exception:

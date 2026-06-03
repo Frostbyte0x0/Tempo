@@ -1,0 +1,6 @@
+{
+  "interval": 5,
+  "sync_intervals": 12,
+  "logging_level": 10,
+  "log_file": "client.log"
+}

@@ -18,26 +18,38 @@ logging.basicConfig(
 
 # TODO:
 # - Implement server logic to receive data from clients and sync it
-# -
-# -
-# -
 # - Website to show the data nicely
+
+def read_data() -> dict:
+    with open("data.json", "r") as f:
+        return json.load(f)
+
+def write_data(data: dict):
+    with open("data.json", "w") as f:
+        json.dump(data, f, indent=2)
 
 
 def wait_and_manage_connection():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("localhost", 8080))
     s.listen(5)
+    logging.info("Server started, waiting for connections on localhost:8080...")
 
     try:
         while True:
             c, addr = s.accept()
+            logging.info(f"Connection established from {addr}")
             received = c.recv(1024)
 
             if received:
-                data = json.loads(received.decode("utf-8"))
-                device_name = data["device_name"]
+                new_data = json.loads(received.decode("utf-8"))
+                device_name = new_data["device_name"]
                 logging.info(f"Received data from {device_name}")
+
+                data = read_data()
+                data[device_name] = new_data
+                write_data(data)
+                logging.info(f"Wrote data to {device_name}")
 
             c.close()
     finally:
@@ -45,4 +57,7 @@ def wait_and_manage_connection():
 
 
 if __name__ == "__main__":
-    wait_and_manage_connection()
+    try:
+        wait_and_manage_connection()
+    except Exception as e:
+        logging.error(e, exc_info=True)

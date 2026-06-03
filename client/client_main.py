@@ -7,24 +7,28 @@ from project_lister import get_active_projects_with_git
 from scanner import get_active_jetbrains_project
 import logging
 
+
+# TODO:
+# - When connected to server, send data and sync
+
+
+def get_settings() -> dict:
+    with open("settings.json", "r") as f:
+        return json.load(f)
+
+
 # Configure logging to save to a file
 # noinspection PyArgumentList
 logging.basicConfig(
     encoding='utf-8',
-    level=logging.DEBUG,
+    level=get_settings()["logging_level"],
     handlers=[
-        logging.FileHandler("client.log", mode="w"),
+        logging.FileHandler(get_settings()["log_file"], mode="w"),
         logging.StreamHandler(sys.stdout)
     ],
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
-
-t = 5  # Time interval in seconds for tracking
-
-# TODO:
-# - When connected to server, send data and sync
-
 
 def read_data() -> dict:
     with open("data.json", "r") as f:
@@ -38,6 +42,8 @@ def write_data(data: dict):
 def increase_time(data: dict, project: str, branch: str):
     if not project:
         return
+
+    t = get_settings()["interval"]
 
     hour = time.strftime("%D %Hh")
 
@@ -98,11 +104,13 @@ def detect() -> dict[str, dict[str, str]] | None:
 
 def sync(client_data):
     c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect(("localhost", 8080))
 
     try:
+        c.connect(("localhost", 8080))
         message = json.dumps(client_data)
         c.sendall(message.encode('utf-8'))
+    except ConnectionRefusedError:
+        logging.debug("No connection with server")
     finally:
         c.close()
 
@@ -112,6 +120,7 @@ def track(project_reports: dict[str, dict[str, str]]):
     data = read_data()
     data["device_name"] = socket.gethostname()
 
+    i = 0
     last_state = None
     while True:
         state, project = get_active_jetbrains_project()
@@ -125,14 +134,21 @@ def track(project_reports: dict[str, dict[str, str]]):
             increase_time(data, project, project_reports[project]["branch"])
             write_data(data)
 
-        sync(data)
+        if i % get_settings()["sync_interval"] == 0:
+            sync(data)
+            i = 0
 
-        time.sleep(t)
+        time.sleep(get_settings()["interval"])
+
+        i += 1
 
 
 if __name__ == "__main__":
-    project_reports = detect()
-    if project_reports:
-        track(project_reports)
-    else:
-        logging.info("Could not find any active projects tracked in JetBrains configs.")
+    try:
+        project_reports = detect()
+        if project_reports:
+            track(project_reports)
+        else:
+            logging.info("Could not find any active projects tracked in JetBrains configs.")
+    except Exception as e:
+        logging.error(e, exc_info=True)
