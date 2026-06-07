@@ -9,7 +9,7 @@ import logging
 
 
 # TODO:
-# - When connected to server, send data and sync
+# - Commands
 
 
 def get_settings() -> dict:

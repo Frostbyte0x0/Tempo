@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <header>
+<!--        <nav>-->
+<!--            <ul>-->
+<!--&lt;!&ndash;                <li><a href="{{ url_for('static', filename='base.html') }}">Home</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                <li><a href="{{ url_for('static', filename='base.html') }}">About</a></li>&ndash;&gt;-->
+<!--&lt;!&ndash;                <li><a href="{{ url_for('static', filename='base.html') }}">Contact</a></li>&ndash;&gt;-->
+<!--            </ul>-->
+<!--        </nav>-->
+        <h1 class="title">Tempo</h1>
+    </header>
+    <main>
+        <div class="sidebar">
+            <ul id="list"></ul>
+
+            <script>
+              const items = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
+
+              const listParent = document.getElementById('list');
+
+              items.forEach(itemText => {
+                const li = document.createElement('li');
+                li.textContent = itemText;
+                listParent.appendChild(li);
+              });
+            </script>
+        </div>
+
+
+
+        <div class="graph">
+          <canvas id="myChart"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+          const ctx = document.getElementById('myChart');
+          Chart.defaults.color = '#FFFFFF';
+
+          new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+              datasets: [{
+                label: 'Time spent',
+                data: [12, 19, 3, 5, 2, 3],
+                borderWidth: 1, 
+                tension: 0.2
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        </script>
+    </main>
+    <footer>
+        <p class="footer">&copy; 2026 Frostbyte0x0. MIT Licence.</p>
+    </footer>
+</body>
+</html>

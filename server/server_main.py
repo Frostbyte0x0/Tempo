@@ -17,7 +17,6 @@ logging.basicConfig(
 )
 
 # TODO:
-# - Implement server logic to receive data from clients and sync it
 # - Website to show the data nicely
 
 def read_data() -> dict:
@@ -44,6 +43,7 @@ def wait_and_manage_connection():
             if received:
                 new_data = json.loads(received.decode("utf-8"))
                 device_name = new_data["device_name"]
+                new_data.pop("device_name")
                 logging.info(f"Received data from {device_name}")
 
                 data = read_data()
