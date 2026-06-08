@@ -1,5 +1,6 @@
 import json
 import socket
+import struct
 import sys
 import time
 
@@ -29,6 +30,14 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
+
+def read_project_list() -> dict:
+    with open("project_list.json", "r") as f:
+        return json.load(f)
+
+def write_project_list(project_list: dict):
+    with open("project_list.json", "w") as f:
+        json.dump(project_list, f, indent=2)
 
 def read_data() -> dict:
     with open("data.json", "r") as f:
@@ -80,9 +89,7 @@ def detect() -> dict[str, dict[str, str]] | None:
     project_reports = get_active_projects_with_git()
 
     if project_reports:
-        with open("project_list.json", "w") as f:
-            json.dump(project_reports, f, indent=2)
-            f.write("\n")
+        write_project_list(project_reports)
 
         for idx, report in enumerate(project_reports.values(), 1):
             logging.info(f"--- [Active Project #{idx}] ---")
@@ -102,12 +109,15 @@ def detect() -> dict[str, dict[str, str]] | None:
     return None
 
 
-def sync(client_data):
+def sync(data: dict, is_project_list:bool = False):
+    logging.debug("Syncing data")
     c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
         c.connect(("localhost", 8080))
-        message = json.dumps(client_data)
+        c.sendall(struct.pack('?', is_project_list))
+
+        message = json.dumps(data)
         c.sendall(message.encode('utf-8'))
     except ConnectionRefusedError:
         logging.debug("No connection with server")
@@ -116,9 +126,12 @@ def sync(client_data):
 
 
 def track(project_reports: dict[str, dict[str, str]]):
-    # Continuous tracking loop
     data = read_data()
     data["device_name"] = socket.gethostname()
+
+    project_list = read_project_list()
+    project_list["device_name"] = socket.gethostname()
+    sync(project_list, True)
 
     i = 0
     last_state = None

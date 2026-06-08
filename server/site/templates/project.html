@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">Tempo</h1>
+    </header>
+    <div class='full-page-bg'></div>
+
+    <div id="user-component" data-user='{{ project_list | tojson }}'></div>
+    <main class="main">
+        <div class="graph">
+            <canvas id="myChart2"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+          const ctx1 = document.getElementById('myChart2');
+          Chart.defaults.color = '#FFFFFF';
+
+          new Chart(ctx1, {
+            type: 'line',
+            data: {
+              labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+              datasets: [{
+                label: 'Minutes',
+                data: [12, 19, 3, 5, 3, 3],
+                borderWidth: 1,
+                tension: 0.2
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        </script>
+
+    </main>
+
+    <footer>
+        <p class="footer">&copy; 2026 Frostbyte0x0. MIT Licence.</p>
+    </footer>
+</body>
+</html>

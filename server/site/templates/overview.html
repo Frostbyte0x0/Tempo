@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">Tempo</h1>
+    </header>
+    <div class='full-page-bg'></div>
+
+    <div id="project_list" data-user='{{ project_list | tojson }}'></div>
+    <div id="project_data" data-user='{{ project_data | tojson }}'></div>
+
+    <main class="main">
+        <div id="sidebar" class="sidebar">
+            <ul id="list">
+                <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Project List:</a></li>
+                <li class="list-item"><a href="/" class="list-item">Overview</a></li>
+            </ul>
+
+            <script>
+                const component = document.getElementById('project_list');
+                const listParent = document.getElementById('list');
+
+                const projectList = JSON.parse(component.dataset.user);
+                const items = Object.keys(projectList);
+
+                items.forEach(itemText => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.textContent = itemText;
+                    a.href = "/project/" + itemText;
+                    a.style.color = "white";
+                    li.appendChild(a);
+                    li.classList.add('list-item');
+                    listParent.appendChild(li);
+                });
+            </script>
+        </div>
+        <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
+
+        <div id="graph-grid" class="graph-grid">
+<!--            <div class="graph">-->
+<!--                <canvas id="myChart"></canvas>-->
+<!--            </div>-->
+
+<!--            <div class="graph">-->
+<!--                <canvas id="myChart2"></canvas>-->
+<!--            </div>-->
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const data = JSON.parse(document.getElementById('project_data').dataset.user);
+
+                const grid = document.getElementById('graph-grid');
+                Chart.defaults.color = '#FFFFFF';
+
+                for (const project of Object.keys(data)) {
+                    console.log(project);
+                    const graph_div = document.createElement('div');
+                    graph_div.classList.add('graph');
+                    const canvas = document.createElement('canvas');
+                    graph_div.appendChild(canvas);
+                    grid.appendChild(graph_div);
+
+                    new Chart(canvas, {
+                        type: 'line',
+                        data: {
+                            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                            datasets: [{
+                                label: project,
+                                data: [12, 19, 3, 5, 4, 3],
+                                borderWidth: 1,
+                                tension: 0.2
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+
+            </script>
+
+
+<!--            <script>-->
+<!--              const ctx1 = document.getElementById('myChart2');-->
+<!--              Chart.defaults.color = '#FFFFFF';-->
+
+<!--              new Chart(ctx1, {-->
+<!--                type: 'line',-->
+<!--                data: {-->
+<!--                  labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],-->
+<!--                  datasets: [{-->
+<!--                    label: 'Minutes',-->
+<!--                    data: [12, 19, 3, 5, 3, 3],-->
+<!--                    borderWidth: 1,-->
+<!--                    tension: 0.2-->
+<!--                  }]-->
+<!--                },-->
+<!--                options: {-->
+<!--                  scales: {-->
+<!--                    y: {-->
+<!--                      beginAtZero: true-->
+<!--                    }-->
+<!--                  }-->
+<!--                }-->
+<!--              });-->
+<!--            </script>-->
+        </div>
+    </main>
+
+    <footer>
+        <p class="footer">&copy; 2026 Frostbyte0x0. MIT Licence.</p>
+    </footer>
+</body>
+</html>

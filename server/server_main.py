@@ -1,6 +1,7 @@
 import json
 import logging
 import socket
+import struct
 import sys
 
 # Configure logging to save to a file
@@ -18,6 +19,14 @@ logging.basicConfig(
 
 # TODO:
 # - Website to show the data nicely
+
+def read_project_list() -> dict:
+    with open("project_list.json", "r") as f:
+        return json.load(f)
+
+def write_project_list(project_list: dict):
+    with open("project_list.json", "w") as f:
+        json.dump(project_list, f, indent=2)
 
 def read_data() -> dict:
     with open("data.json", "r") as f:
@@ -38,18 +47,28 @@ def wait_and_manage_connection():
         while True:
             c, addr = s.accept()
             logging.info(f"Connection established from {addr}")
+
+            is_project_list = struct.unpack('?', c.recv(1))[0]
+
             received = c.recv(1024)
 
             if received:
                 new_data = json.loads(received.decode("utf-8"))
                 device_name = new_data["device_name"]
-                new_data.pop("device_name")
                 logging.info(f"Received data from {device_name}")
+                new_data.pop("device_name")
 
-                data = read_data()
-                data[device_name] = new_data
-                write_data(data)
-                logging.info(f"Wrote data to {device_name}")
+                if is_project_list:
+                    project_list = read_project_list()
+                    project_list[device_name] = new_data
+                    write_project_list(project_list)
+                    logging.info(f"Wrote project list to {device_name}")
+
+                else:
+                    data = read_data()
+                    data[device_name] = new_data
+                    write_data(data)
+                    logging.info(f"Wrote data to {device_name}")
 
             c.close()
     finally:
