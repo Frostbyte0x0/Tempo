@@ -1,6 +1,7 @@
 {
-  "interval": 5,
+  "interval": 0.5,
   "sync_intervals": 12,
   "logging_level": 10,
-  "log_file": "client.log"
+  "log_file": "client.log",
+  "auto_sync": true
 }

@@ -13,8 +13,7 @@
     </header>
     <div class='full-page-bg'></div>
 
-    <div id="project_list" data-user='{{ project_list | tojson }}'></div>
-    <div id="project_data" data-user='{{ project_data | tojson }}'></div>
+    <div id="data" data-user='{{ data | tojson }}'></div>
 
     <main class="main">
         <div id="sidebar" class="sidebar">
@@ -24,10 +23,9 @@
             </ul>
 
             <script>
-                const component = document.getElementById('project_list');
                 const listParent = document.getElementById('list');
 
-                const projectList = JSON.parse(component.dataset.user);
+                const projectList = JSON.parse(document.getElementById("data").dataset.user)["project_list"];
                 const items = Object.keys(projectList);
 
                 items.forEach(itemText => {
@@ -45,37 +43,42 @@
         <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
 
         <div id="graph-grid" class="graph-grid">
-<!--            <div class="graph">-->
-<!--                <canvas id="myChart"></canvas>-->
-<!--            </div>-->
-
-<!--            <div class="graph">-->
-<!--                <canvas id="myChart2"></canvas>-->
-<!--            </div>-->
-
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
-                const data = JSON.parse(document.getElementById('project_data').dataset.user);
+                const data = JSON.parse(document.getElementById('data').dataset.user);
+                const project_data = data["project_data"];
+                const labels = data["labels"];
 
                 const grid = document.getElementById('graph-grid');
                 Chart.defaults.color = '#FFFFFF';
 
-                for (const project of Object.keys(data)) {
-                    console.log(project);
-                    const graph_div = document.createElement('div');
-                    graph_div.classList.add('graph');
+                for (const project of Object.keys(project_data)) {
+                    const graphDiv = document.createElement('div');
+                    graphDiv.classList.add('graph');
+
+                    const topInfoElement = document.createElement('a');
+                    topInfoElement.classList.add('top-info-text');
+                    topInfoElement.textContent = project + " - " + data["project_data"][project]["total"] + " minutes";
+                    graphDiv.appendChild(topInfoElement);
+
                     const canvas = document.createElement('canvas');
-                    graph_div.appendChild(canvas);
-                    grid.appendChild(graph_div);
+                    graphDiv.appendChild(canvas);
+                    grid.appendChild(graphDiv);
+
+                    const bottomInfoElement = document.createElement('a');
+                    bottomInfoElement.classList.add('bottom-info-text');
+                    bottomInfoElement.textContent = data["languages"][project] + " - " + data["descriptions"][project];
+                    graphDiv.appendChild(bottomInfoElement);
 
                     new Chart(canvas, {
                         type: 'line',
                         data: {
-                            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                            labels: labels,
                             datasets: [{
-                                label: project,
-                                data: [12, 19, 3, 5, 4, 3],
-                                borderWidth: 1,
+                                label: 'minutes',
+                                data: data["data_sets"][project],
+                                borderWidth: 2,
+                                borderColor: '#5aedc7',
                                 tension: 0.2
                             }]
                         },
@@ -83,6 +86,11 @@
                             scales: {
                                 y: {
                                     beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
                                 }
                             }
                         }

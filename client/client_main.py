@@ -147,11 +147,11 @@ def track(project_reports: dict[str, dict[str, str]]):
             increase_time(data, project, project_reports[project]["branch"])
             write_data(data)
 
-        if i % get_settings()["sync_interval"] == 0:
+        if i % get_settings()["sync_intervals"] == 0:
             sync(data)
             i = 0
 
-        time.sleep(get_settings()["interval"])
+        time.sleep(get_settings()["interval"] * 60)
 
         i += 1
 

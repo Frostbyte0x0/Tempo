@@ -12,7 +12,12 @@
     display: flex;
 }
 
+canvas {
+    padding: 10px 0;
+}
+
 .graph {
+    text-align: left;
     width: 100%;
     color: white;
 }
@@ -31,6 +36,20 @@
     color: white;
     font-size: 40px;
     font-family: comfortaa, sans-serif;
+}
+
+.top-info-text {
+    color: white;
+    font-size: 24px;
+    font-family: comfortaa, sans-serif;
+    margin-left: 10px;
+}
+
+.bottom-info-text {
+    color: grey;
+    font-size: 18px;
+    font-family: comfortaa, sans-serif;
+    margin-left: 10px;
 }
 
 .footer {
