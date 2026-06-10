@@ -13,39 +13,87 @@
     </header>
     <div class='full-page-bg'></div>
 
-    <div id="user-component" data-user='{{ project_list | tojson }}'></div>
+    <div id="data" data-user='{{ data | tojson }}'></div>
+
     <main class="main">
-        <div class="graph">
-            <canvas id="myChart2"></canvas>
+        <div id="sidebar" class="sidebar">
+            <ul id="list">
+                <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Branches:</a></li>
+                <li class="list-item"><a href="/" class="list-item">Overview</a></li>
+            </ul>
+
+            <script>
+                const listParent = document.getElementById('list');
+
+                const projectList = JSON.parse(document.getElementById("data").dataset.user)["project_list"];
+                const items = Object.keys(projectList);
+
+                items.forEach(itemText => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.textContent = itemText;
+                    a.href = "/project/" + itemText;
+                    a.style.color = "white";
+                    li.appendChild(a);
+                    li.classList.add('list-item');
+                    listParent.appendChild(li);
+                });
+            </script>
         </div>
+        <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <div id="graph" class="graph" style="padding: 0 10%">
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const data = JSON.parse(document.getElementById('data').dataset.user);
+                const project_data = data["project_data"];
+                const labels = data["labels"];
 
-        <script>
-          const ctx1 = document.getElementById('myChart2');
-          Chart.defaults.color = '#FFFFFF';
+                Chart.defaults.color = '#FFFFFF';
 
-          new Chart(ctx1, {
-            type: 'line',
-            data: {
-              labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-              datasets: [{
-                label: 'Minutes',
-                data: [12, 19, 3, 5, 3, 3],
-                borderWidth: 1,
-                tension: 0.2
-              }]
-            },
-            options: {
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
-              }
-            }
-          });
-        </script>
+                const graphDiv = document.getElementById('graph');
 
+                const topInfoElement = document.createElement('a');
+                topInfoElement.classList.add('top-info-text');
+                topInfoElement.textContent = data["project"] + " - " + data["project_data"]["total"] + " minutes";
+                graphDiv.appendChild(topInfoElement);
+
+                const bottomInfoElement = document.createElement('a');
+                bottomInfoElement.classList.add('top-info-text');
+                bottomInfoElement.textContent = data["language"] + " - " + data["description"];
+                graphDiv.appendChild(bottomInfoElement);
+
+                const canvas = document.createElement('canvas');
+                graphDiv.appendChild(canvas);
+
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'minutes',
+                            data: data["data_set"],
+                            borderWidth: 2,
+                            borderColor: '#5aedc7',
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            </script>
+
+        </div>
     </main>
 
     <footer>

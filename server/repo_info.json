@@ -1,0 +1,109 @@
+{
+  "stellaris": {
+    "language": "Java",
+    "description": "Discover the next gen space mod!",
+    "found": true
+  },
+  "Murdershrooms": {
+    "language": "Java",
+    "description": "A mod that adds murdershrooms",
+    "found": true
+  },
+  "Frostbite": {
+    "language": "Java",
+    "description": "A WIP Minecraft mod that adds an RPG style freezing dimension",
+    "found": true
+  },
+  "Resonance": {
+    "language": "Java",
+    "description": "A WIP neoforge mod that adds an NPC and quest system",
+    "found": true
+  },
+  "ParcelsCanadaPost": {
+    "language": "Python",
+    "description": "An app to track if the parcel is being delivered with a certain delivery company",
+    "found": true
+  },
+  "GridMaker": {
+    "language": "Python",
+    "description": null,
+    "found": true
+  },
+  "InternetSpeedTracker": {
+    "language": "Python",
+    "description": "Tracks your internet speed over an interval of time specified",
+    "found": true
+  },
+  "Soundboard": {
+    "language": "Python",
+    "description": null,
+    "found": true
+  },
+  "TopographicNoise": {
+    "language": "Python",
+    "description": null,
+    "found": true
+  },
+  "Snake": {
+    "language": "Python",
+    "description": "snake",
+    "found": true
+  },
+  "NeoModdingHelper": {
+    "language": "Python",
+    "description": "A tool to help create base files for neoforge mods for entities, items, blocks and particles",
+    "found": true
+  },
+  "Chess": {
+    "language": "Python",
+    "description": "Simple game of chess",
+    "found": true
+  },
+  "KinovaClient": {
+    "language": "Python",
+    "description": "A program that draws an SVG image using a Kinova Gen3 Lite robotic arm",
+    "found": true
+  },
+  "Tempo": {
+    "language": "Python",
+    "description": "A tool to track time spent coding on Jetbrains apps for now",
+    "found": true
+  },
+  "InverseKinematics": {
+    "language": "C#",
+    "description": "Inverse kinematics server for a 6 axis robot arm",
+    "found": true
+  },
+  "DebugKinematics": {
+    "language": "C#",
+    "description": "Inverse kinematics server for a 6 axis robot arm",
+    "found": true
+  },
+  "MessingAroundMod-1.21": {
+    "found": false
+  },
+  "ProjetProg1": {
+    "found": false
+  },
+  "exercisesJava2": {
+    "found": false
+  },
+  "Projet2Java": {
+    "found": false
+  },
+  "Projet1FX": {
+    "found": false
+  },
+  "demo": {
+    "found": false
+  },
+  "Physics-GPT": {
+    "found": false
+  },
+  "Inverse-Kinematics": {
+    "found": false
+  },
+  "HackGPT": {
+    "found": false
+  }
+}

@@ -16,6 +16,16 @@
     <div id="data" data-user='{{ data | tojson }}'></div>
 
     <main class="main">
+        <script>
+            if (JSON.parse(document.getElementById("data").dataset.user)["needs_key"]) {
+                let personInput = prompt("You have exceeded the github rate limit, please create a Personal Access Token and enter it:", "Your Key");
+
+                if (personInput !== null && personInput !== "") {
+                    window.location.href = "/?text_data=" + encodeURIComponent(personInput);
+                }
+            }
+        </script>
+
         <div id="sidebar" class="sidebar">
             <ul id="list">
                 <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Project List:</a></li>
@@ -30,11 +40,14 @@
 
                 items.forEach(itemText => {
                     const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.textContent = itemText;
-                    a.href = "/project/" + itemText;
-                    a.style.color = "white";
-                    li.appendChild(a);
+                    const button = document.createElement('button');
+                    button.classList.add('side-button');
+                    button.textContent = itemText;
+                    button.addEventListener('click', () => {
+                        window.location.href = '/project/' + itemText;
+                    });
+                    button.color = "white";
+                    li.appendChild(button);
                     li.classList.add('list-item');
                     listParent.appendChild(li);
                 });
@@ -58,7 +71,8 @@
 
                     const topInfoElement = document.createElement('a');
                     topInfoElement.classList.add('top-info-text');
-                    topInfoElement.textContent = project + " - " + data["project_data"][project]["total"] + " minutes";
+                    const t = data["project_data"][project]["total"];
+                    topInfoElement.textContent = project + " - " + Math.floor(t / 60) + " hours, " + t % 60 + " minutes";
                     graphDiv.appendChild(topInfoElement);
 
                     const canvas = document.createElement('canvas');
@@ -98,32 +112,6 @@
                 }
 
             </script>
-
-
-<!--            <script>-->
-<!--              const ctx1 = document.getElementById('myChart2');-->
-<!--              Chart.defaults.color = '#FFFFFF';-->
-
-<!--              new Chart(ctx1, {-->
-<!--                type: 'line',-->
-<!--                data: {-->
-<!--                  labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],-->
-<!--                  datasets: [{-->
-<!--                    label: 'Minutes',-->
-<!--                    data: [12, 19, 3, 5, 3, 3],-->
-<!--                    borderWidth: 1,-->
-<!--                    tension: 0.2-->
-<!--                  }]-->
-<!--                },-->
-<!--                options: {-->
-<!--                  scales: {-->
-<!--                    y: {-->
-<!--                      beginAtZero: true-->
-<!--                    }-->
-<!--                  }-->
-<!--                }-->
-<!--              });-->
-<!--            </script>-->
         </div>
     </main>
 
