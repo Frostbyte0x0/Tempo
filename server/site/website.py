@@ -19,6 +19,18 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
+# TODO:
+# - Overview tab, show total with list of languages
+# - Finish project view
+#   - Branches
+#   - Time frame selection
+#   - Time frame info
+#   - Commit placement
+# - Check PAT key github
+# - Sorting on list page
+# - Link with github info and sync
+
+
 @app.route("/")
 def main():
     user_input = request.args.get('text_data', '')
@@ -27,12 +39,12 @@ def main():
 
     project_list = read_project_list()
     project_data = get_data_by_project()
-    repos, needs_key = read_and_update_repo_info(project_list)
+    repos, needs_key = read_and_update_repo_info({project: project_list[project]["remote_url"] for project in project_data.keys()})
     data_sets = {project: get_time_in_week(project_data[project]) for project in project_data.keys()}
-    languages = {project: get_project_language(project_list[project], repos) for project in project_data.keys()}
-    descriptions = {project: get_project_description(project_list[project], repos, 45) for project in project_data.keys()}
+    languages = {project: get_project_language(project_list[project], repos[project]) for project in project_data.keys()}
+    descriptions = {project: get_project_description(project_list[project], repos[project], 45) for project in project_data.keys()}
 
-    return render_template("overview.html",
+    return render_template("list.html",
         data={
             "project_list": project_list,
             "project_data": project_data,
@@ -47,9 +59,9 @@ def main():
 
 
 @app.route("/project/<project>")
-def show_user_profile(project):
+def project(project):
     project_list = read_project_list()
-    repos, needs_key = read_and_update_repo_info(project_list)
+    repo, needs_key = get_repo_info(project_list[project]["remote_url"])
 
     project_data = get_data_by_project()
     if project not in project_data:
@@ -59,16 +71,37 @@ def show_user_profile(project):
         project_data = project_data[project]
         data_set = get_time_in_week(project_data)
 
-    language = get_project_language(project_list[project], repos)
-    description = get_project_description(project_list[project], repos)
+    language = get_project_language(project_list[project], repo)
+    description = get_project_description(project_list[project], repo)
 
     return render_template("project.html", data={
         "project": project,
         "project_data": project_data,
         "labels": [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
         "data_set": data_set,
+        "branches": data_set, #
+        "commits_per_branch": data_set, #
         "language": language,
         "description": description,
+        "github_link": project_list[project]["remote_url"],
+        "nb_commits": description, #
+        "needs_key": needs_key,
+    })
+
+
+@app.route("/overview")
+def overview():
+    project_list = read_project_list()
+    project_data = get_data_by_project()["Tempo"]
+
+    repos, needs_key = read_and_update_repo_info({project: project_list[project]["remote_url"] for project in project_data.keys()})
+
+    data_set = get_time_in_week(project_data)
+
+    return render_template("overview.html", data={
+        "project_data": project_data,
+        "labels": [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
+        "data_set": data_set,
         "needs_key": needs_key,
     })
 

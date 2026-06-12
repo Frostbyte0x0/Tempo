@@ -15,20 +15,14 @@
 
     <div id="data" data-user='{{ data | tojson }}'></div>
 
+    <button class="back-button">
+        <a href="/" style="color: white; text-decoration: none;">Home</a>
+    </button>
+
     <main class="main">
-        <script>
-            if (JSON.parse(document.getElementById("data").dataset.user)["needs_key"]) {
-                let personInput = prompt("You have exceeded the github rate limit, please create a Personal Access Token and enter it:", "Your Key");
-
-                if (personInput !== null && personInput !== "") {
-                    window.location.href = "/?text_data=" + encodeURIComponent(personInput);
-                }
-            }
-        </script>
-
         <div id="sidebar" class="sidebar">
             <ul id="list">
-                <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Project List:</a></li>
+                <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Branches:</a></li>
                 <li class="list-item"><a href="/" class="list-item">Overview</a></li>
             </ul>
 
@@ -40,14 +34,11 @@
 
                 items.forEach(itemText => {
                     const li = document.createElement('li');
-                    const button = document.createElement('button');
-                    button.classList.add('side-button');
-                    button.textContent = itemText;
-                    button.addEventListener('click', () => {
-                        window.location.href = '/project/' + itemText;
-                    });
-                    button.color = "white";
-                    li.appendChild(button);
+                    const a = document.createElement('a');
+                    a.textContent = itemText;
+                    a.href = "/project/" + itemText;
+                    a.style.color = "white";
+                    li.appendChild(a);
                     li.classList.add('list-item');
                     listParent.appendChild(li);
                 });
@@ -55,63 +46,57 @@
         </div>
         <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
 
-        <div id="graph-grid" class="graph-grid">
+        <div id="graph" class="graph" style="padding: 0 10%">
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
                 const data = JSON.parse(document.getElementById('data').dataset.user);
                 const project_data = data["project_data"];
                 const labels = data["labels"];
 
-                const grid = document.getElementById('graph-grid');
                 Chart.defaults.color = '#FFFFFF';
 
-                for (const project of Object.keys(project_data)) {
-                    const graphDiv = document.createElement('div');
-                    graphDiv.classList.add('graph');
+                const graphDiv = document.getElementById('graph');
 
-                    const topInfoElement = document.createElement('a');
-                    topInfoElement.classList.add('top-info-text');
-                    const t = data["project_data"][project]["total"];
-                    topInfoElement.textContent = project + " - " + Math.floor(t / 60) + " hours, " + t % 60 + " minutes";
-                    graphDiv.appendChild(topInfoElement);
+                const topInfoElement = document.createElement('a');
+                topInfoElement.classList.add('top-info-text');
+                topInfoElement.textContent = data["project"] + " - " + data["project_data"]["total"] + " minutes";
+                graphDiv.appendChild(topInfoElement);
 
-                    const canvas = document.createElement('canvas');
-                    graphDiv.appendChild(canvas);
-                    grid.appendChild(graphDiv);
+                const bottomInfoElement = document.createElement('a');
+                bottomInfoElement.classList.add('top-info-text');
+                bottomInfoElement.textContent = data["language"] + " - " + data["description"];
+                graphDiv.appendChild(bottomInfoElement);
 
-                    const bottomInfoElement = document.createElement('a');
-                    bottomInfoElement.classList.add('bottom-info-text');
-                    bottomInfoElement.textContent = data["languages"][project] + " - " + data["descriptions"][project];
-                    graphDiv.appendChild(bottomInfoElement);
+                const canvas = document.createElement('canvas');
+                graphDiv.appendChild(canvas);
 
-                    new Chart(canvas, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'minutes',
-                                data: data["data_sets"][project],
-                                borderWidth: 2,
-                                borderColor: '#5aedc7',
-                                tension: 0.2
-                            }]
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'minutes',
+                            data: data["data_set"],
+                            borderWidth: 2,
+                            borderColor: '#5aedc7',
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         }
-                    });
-                }
-
+                    }
+                });
             </script>
+
         </div>
     </main>
 

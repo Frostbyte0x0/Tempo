@@ -17,9 +17,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-# TODO:
-# - Website to show the data nicely
-
 def read_project_list() -> dict:
     with open("project_list.json", "r") as f:
         return json.load(f)

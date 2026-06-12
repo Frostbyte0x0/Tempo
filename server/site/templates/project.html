@@ -15,6 +15,10 @@
 
     <div id="data" data-user='{{ data | tojson }}'></div>
 
+    <button class="back-button">
+        <a href="/" style="color: white; text-decoration: none;">Home</a>
+    </button>
+
     <main class="main">
         <div id="sidebar" class="sidebar">
             <ul id="list">
@@ -43,7 +47,16 @@
         <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
 
         <div id="graph" class="graph" style="padding: 0 10%">
+
+            <div>
+                <a id="top-a" class="top-info-text"></a>
+            </div>
+            <div>
+                <a id="bottom-a" class="top-info-text"></a>
+            </div>
+
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
             <script>
                 const data = JSON.parse(document.getElementById('data').dataset.user);
                 const project_data = data["project_data"];
@@ -51,17 +64,46 @@
 
                 Chart.defaults.color = '#FFFFFF';
 
-                const graphDiv = document.getElementById('graph');
+                const graphDiv = document.getElementById("graph");
 
-                const topInfoElement = document.createElement('a');
-                topInfoElement.classList.add('top-info-text');
-                topInfoElement.textContent = data["project"] + " - " + data["project_data"]["total"] + " minutes";
-                graphDiv.appendChild(topInfoElement);
+                const verticalLinePlugin = {
+                    id: 'verticalLine',
+                    afterDraw(chart, args, pluginOptions) {
+                        const xScale = chart.scales.x;
+                        if (!xScale || pluginOptions.index === undefined || pluginOptions.index === null) {
+                            return;
+                        }
 
-                const bottomInfoElement = document.createElement('a');
-                bottomInfoElement.classList.add('top-info-text');
-                bottomInfoElement.textContent = data["language"] + " - " + data["description"];
-                graphDiv.appendChild(bottomInfoElement);
+                        const x = xScale.getPixelForValue(pluginOptions.index);
+                        const { ctx, chartArea } = chart;
+
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(x, chartArea.top);
+                        ctx.lineTo(x, chartArea.bottom);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = "#5aedc7";
+                        ctx.stroke();
+
+                        if (pluginOptions.label) {
+                            ctx.fillStyle = "#5aedc7";
+                            ctx.font = '14px comfortaa, sans-serif';
+                            ctx.textAlign = 'left';
+                            ctx.fillText(pluginOptions.label, x + 6, chartArea.top + 14);
+                        }
+
+                        ctx.restore();
+                    }
+                };
+
+                Chart.register(verticalLinePlugin);
+
+                const topInfoElement = document.getElementById("top-a");
+                const t = data["project_data"]["total"];
+                topInfoElement.textContent = data["project"] + " - " + Math.floor(t / 60) + " hours, " + t % 60 + " minutes";
+
+                const bottomInfoElement = document.getElementById("bottom-a");
+                bottomInfoElement.textContent = "[" + data["language"] + "] " + data["description"];
 
                 const canvas = document.createElement('canvas');
                 graphDiv.appendChild(canvas);
@@ -87,6 +129,10 @@
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            verticalLine: {
+                                index: 1,
+                                label: 'Target Date'
                             }
                         }
                     }

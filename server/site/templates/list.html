@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">Tempo</h1>
+    </header>
+    <div class='full-page-bg'></div>
+
+    <div id="data" data-user='{{ data | tojson }}'></div>
+
+    <main class="main">
+        <script>
+            if (JSON.parse(document.getElementById("data").dataset.user)["needs_key"]) {
+                let personInput = prompt("You have exceeded the github rate limit, please create a Personal Access Token and enter it:", "Your Key");
+
+                if (personInput !== null && personInput !== "") {
+                    window.location.href = "/?text_data=" + encodeURIComponent(personInput);
+                }
+            }
+        </script>
+
+        <div id="sidebar" class="sidebar">
+            <ul id="list">
+                <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Options:</a></li>
+                <li class="list-item"><button onclick="window.location.href='/overview'" class="side-button" style="font-size: 20px">Overview</button></li>
+            </ul>
+
+            <script>
+                const listParent = document.getElementById('list');
+
+                const projectList = JSON.parse(document.getElementById("data").dataset.user)["project_list"];
+                const items = Object.keys(projectList);
+
+                items.forEach(itemText => {
+                    const li = document.createElement('li');
+                    const button = document.createElement('button');
+                    button.classList.add('side-button');
+                    button.textContent = itemText;
+                    button.addEventListener('click', () => {
+                        window.location.href = '/project/' + itemText;
+                    });
+                    button.color = "white";
+                    li.appendChild(button);
+                    li.classList.add('list-item');
+                    listParent.appendChild(li);
+                });
+            </script>
+        </div>
+        <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
+
+        <div id="graph-grid" class="graph-grid">
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const data = JSON.parse(document.getElementById('data').dataset.user);
+                const project_data = data["project_data"];
+                const labels = data["labels"];
+
+                const grid = document.getElementById('graph-grid');
+                Chart.defaults.color = '#FFFFFF';
+
+                for (const project of Object.keys(project_data)) {
+                    const graphDiv = document.createElement('div');
+                    graphDiv.classList.add('graph');
+
+                    const topInfoElement = document.createElement('a');
+                    topInfoElement.classList.add('top-info-text');
+                    const t = data["project_data"][project]["total"];
+                    topInfoElement.textContent = project + " - " + Math.floor(t / 60) + " hours, " + t % 60 + " minutes";
+                    graphDiv.appendChild(topInfoElement);
+
+                    const canvas = document.createElement('canvas');
+                    graphDiv.appendChild(canvas);
+                    grid.appendChild(graphDiv);
+
+                    const bottomInfoElement = document.createElement('a');
+                    bottomInfoElement.classList.add('bottom-info-text');
+                    bottomInfoElement.textContent = "[" + data["languages"][project] + "] " + data["descriptions"][project];
+                    graphDiv.appendChild(bottomInfoElement);
+
+                    new Chart(canvas, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'minutes',
+                                data: data["data_sets"][project],
+                                borderWidth: 2,
+                                borderColor: '#5aedc7',
+                                tension: 0.2
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+
+            </script>
+        </div>
+    </main>
+
+    <footer>
+        <p class="footer">&copy; 2026 Frostbyte0x0. MIT Licence.</p>
+    </footer>
+</body>
+</html>
