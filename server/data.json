@@ -46,7 +46,7 @@
         }
       }
     },
-    "Resonance": {
+    "KinovaClient": {
       "total": 5,
       "per_branch": {
         "master": {
@@ -58,7 +58,7 @@
           "06/07/26 12h": 500,
           "06/07/26 18h": 305
         },
-        "second": {
+        "prototype": {
           "total": 315,
           "06/04/26 11h": 300,
           "06/04/26 12h": 100,

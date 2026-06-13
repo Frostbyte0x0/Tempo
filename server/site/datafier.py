@@ -75,6 +75,21 @@ def get_time_in_week(project: dict) -> list[float]:
     return list(result_data.values())
 
 
+def get_time_in_week_per_branch(project: dict) -> dict[str, list[float]]:
+    per_branch = project["per_branch"]
+
+    result = {}
+    for branch, branch_data in per_branch.items():
+        result_data = {(date.today() - timedelta(days=i)).strftime("%D"): 0 for i in range(6, -1, -1)}
+        for date_key, data in branch_data.items():
+            day = date_key.split(" ")[0]
+            if day in result_data.keys():
+                result_data[day] += data
+        result[branch] = list(result_data.values())
+
+    return result
+
+
 def get_repo(user: str, name: str) -> tuple[Repository | None, bool]:
     try:
         return g.get_repo(f"{user}/{name}"), False
@@ -100,11 +115,12 @@ def get_repo_info(remote_url: str) -> tuple[dict, bool]:
             "language": repo.language,
             "description": repo.description,
             "commit_number": repo.get_commits().totalCount,
-            "commits": [{
+            "commits_per_branch": {branch.name: [{
                 "author": commit.commit.author.name,
                 "date": commit.commit.author.date.strftime("%Y-%m-%d %H:%M:%S"),
                 "message": commit.commit.message.splitlines()[0],
-            } for commit in repo.get_commits()[:100]],
+            } for commit in repo.get_commits(sha=branch.name)[:50]]
+            for branch in repo.get_branches()},
         }
     else:
         repo_info = {
@@ -112,8 +128,8 @@ def get_repo_info(remote_url: str) -> tuple[dict, bool]:
             "language": None,
             "description": None,
             "commit_number": 0,
-            "commits": [],
-    }
+            "commits_per_branch": {},
+        }
 
     d[info[-1]] = repo_info
     with open(file_path, "w") as f:
@@ -133,44 +149,6 @@ def read_and_update_repo_info(project_urls: dict) -> tuple[dict, bool]:
             break
 
     return d, rate_limit_reached
-
-
-# def read_and_update_repo_info(project_list: dict) -> tuple[dict, bool]:
-#     file_path = Path(__file__).resolve().parent.parent / "repo_info.json"
-#     with open(file_path, "r") as f:
-#         d = json.load(f)
-#
-#     for project, values in project_list.items():
-#         if project not in d and values["remote_url"].endswith(".git"):
-#             info = values["remote_url"][:-4].split("/")
-#             repo, rate_limit_reached = get_repo(info[-2], info[-1])
-#             if repo:
-#                 print(f"Updated info on {project}")
-#                 d[project] = {
-#                     "language": repo.language,
-#                     "description": repo.description,
-#                     "found": True,
-#                     "commits": [{
-#                         "author": commit.commit.author.name,
-#                         "date": commit.commit.author.date.strftime("%Y-%m-%d %H:%M:%S"),
-#                         "message": commit.commit.message.splitlines()[0],
-#                     } for commit in repo.get_commits()[:100]],
-#                 }
-#             elif rate_limit_reached:
-#                 with open(file_path, "w") as f:
-#                     json.dump(d, f, indent=2)
-#                 return d, True # Rate limit reached, needs key
-#             else:
-#                 d[project] = {
-#                     "language": None,
-#                     "description": None,
-#                     "found": False,
-#                     "commits": [],
-#                 }
-#
-#     with open(file_path, "w") as f:
-#         json.dump(d, f, indent=2)
-#     return d, False # Rate limit not reached, no need for key
 
 
 def get_project_language(project: dict, repo: dict) -> str:

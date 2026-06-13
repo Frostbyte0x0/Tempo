@@ -66,10 +66,10 @@ def project(project):
     project_data = get_data_by_project()
     if project not in project_data:
         project_data = {"total": 0}
-        data_set = [0, 0, 0, 0, 0, 0, 0]
+        data_sets = {"main": [0, 0, 0, 0, 0, 0, 0]}
     else:
         project_data = project_data[project]
-        data_set = get_time_in_week(project_data)
+        data_sets = get_time_in_week_per_branch(project_data)
 
     language = get_project_language(project_list[project], repo)
     description = get_project_description(project_list[project], repo)
@@ -78,13 +78,12 @@ def project(project):
         "project": project,
         "project_data": project_data,
         "labels": [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
-        "data_set": data_set,
-        "branches": data_set, #
-        "commits_per_branch": data_set, #
+        "data_sets": data_sets,
+        "commits_per_branch": repo["commits_per_branch"],
         "language": language,
         "description": description,
-        "github_link": project_list[project]["remote_url"],
-        "nb_commits": description, #
+        "github_link": project_list[project]["remote_url"][:-4],
+        "commit_number": repo["commit_number"],
         "needs_key": needs_key,
     })
 

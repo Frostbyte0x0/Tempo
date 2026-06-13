@@ -11,7 +11,7 @@
     <header>
         <h1 class="title">Tempo</h1>
     </header>
-    <div class='full-page-bg'></div>
+    <div class="full-page-bg"></div>
 
     <div id="data" data-user='{{ data | tojson }}'></div>
 
@@ -19,55 +19,81 @@
         <a href="/" style="color: white; text-decoration: none;">Home</a>
     </button>
 
+    <script>
+        const allDatasets = JSON.parse(document.getElementById("data").dataset.user)["data_sets"];
+        let datasets = JSON.parse(document.getElementById("data").dataset.user)["data_sets"];
+
+        function flipBranch(branch) {
+            console.log(branch);
+            if (Object.keys(datasets).includes(branch)) {
+                datasets = Object.fromEntries(Object.entries(datasets).filter(([k, b]) => b !== branch));
+            } else {
+                datasets[branch] = allDatasets[branch];
+            }
+        }
+    </script>
+
     <main class="main">
         <div id="sidebar" class="sidebar">
             <ul id="list">
                 <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Branches:</a></li>
-                <li class="list-item"><a href="/" class="list-item">Overview</a></li>
             </ul>
 
             <script>
-                const listParent = document.getElementById('list');
+                const listParent = document.getElementById("list");
 
-                const projectList = JSON.parse(document.getElementById("data").dataset.user)["project_list"];
-                const items = Object.keys(projectList);
+                const commits = JSON.parse(document.getElementById("data").dataset.user)["commits_per_branch"];
+                const branches = Object.keys(commits);
 
-                items.forEach(itemText => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.textContent = itemText;
-                    a.href = "/project/" + itemText;
-                    a.style.color = "white";
-                    li.appendChild(a);
-                    li.classList.add('list-item');
+                branches.forEach(branch => {
+                    const li = document.createElement("li");
+                    const button = document.createElement("button");
+                    button.classList.add("side-button");
+                    button.textContent = branch;
+                    button.addEventListener("click", () => {
+                        flipBranch(branch);
+                        chart.update();
+                    });
+                    button.color = "white";
+                    li.appendChild(button);
+                    li.classList.add("list-item");
                     listParent.appendChild(li);
                 });
             </script>
         </div>
-        <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
+        <script> document.getElementById("sidebar").style.height = listParent.clientHeight + 20 + "px" </script>
 
         <div id="graph" class="graph" style="padding: 0 10%">
 
-            <div>
-                <a id="top-a" class="top-info-text"></a>
-            </div>
-            <div>
-                <a id="bottom-a" class="top-info-text"></a>
-            </div>
+            <div><a id="top-a" class="top-info-text"></a></div>
+            <div><a id="middle-a" class="top-info-text"></a></div>
+            <div><a id="bottom-a" class="top-info-text"></a></div>
 
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
             <script>
-                const data = JSON.parse(document.getElementById('data').dataset.user);
+                const data = JSON.parse(document.getElementById("data").dataset.user);
                 const project_data = data["project_data"];
                 const labels = data["labels"];
 
-                Chart.defaults.color = '#FFFFFF';
+                Chart.defaults.color = "#FFFFFF";
 
                 const graphDiv = document.getElementById("graph");
 
+                const t = data["project_data"]["total"];
+                const link = document.createElement("a");
+                link.href = data["github_link"];
+                link.target = "_blank";
+                link.textContent = "Github";
+                link.style.color = "#2391cc";
+                document.getElementById("top-a").textContent = data["project"] + " [" + data["language"] + "], ";
+                document.getElementById("top-a").appendChild(link);
+                document.getElementById("middle-a").textContent = Math.floor(t / 60) + " hours, " + t % 60 + " minutes, " +
+                    data["commit_number"] + " commits in " + Object.keys(data["commits_per_branch"]).length + " branches";
+                document.getElementById("bottom-a").textContent = data["description"];
+
                 const verticalLinePlugin = {
-                    id: 'verticalLine',
+                    id: "verticalLine",
                     afterDraw(chart, args, pluginOptions) {
                         const xScale = chart.scales.x;
                         if (!xScale || pluginOptions.index === undefined || pluginOptions.index === null) {
@@ -87,8 +113,8 @@
 
                         if (pluginOptions.label) {
                             ctx.fillStyle = "#5aedc7";
-                            ctx.font = '14px comfortaa, sans-serif';
-                            ctx.textAlign = 'left';
+                            ctx.font = "14px comfortaa, sans-serif";
+                            ctx.textAlign = "left";
                             ctx.fillText(pluginOptions.label, x + 6, chartArea.top + 14);
                         }
 
@@ -98,27 +124,21 @@
 
                 Chart.register(verticalLinePlugin);
 
-                const topInfoElement = document.getElementById("top-a");
-                const t = data["project_data"]["total"];
-                topInfoElement.textContent = data["project"] + " - " + Math.floor(t / 60) + " hours, " + t % 60 + " minutes";
-
-                const bottomInfoElement = document.getElementById("bottom-a");
-                bottomInfoElement.textContent = "[" + data["language"] + "] " + data["description"];
-
-                const canvas = document.createElement('canvas');
+                const canvas = document.createElement("canvas");
                 graphDiv.appendChild(canvas);
 
-                new Chart(canvas, {
-                    type: 'line',
+                let chart = new Chart(canvas, {
+                    type: "line",
                     data: {
                         labels: labels,
-                        datasets: [{
-                            label: 'minutes',
-                            data: data["data_set"],
-                            borderWidth: 2,
-                            borderColor: '#5aedc7',
-                            tension: 0.2
-                        }]
+                        datasets: Object.entries(datasets).map(([b, d]) => {
+                            return {
+                                label: b,
+                                data: d,
+                                borderWidth: 2,
+                                borderColor: "#5aedc7",
+                                tension: 0.2
+                        }})
                     },
                     options: {
                         scales: {
@@ -128,11 +148,11 @@
                         },
                         plugins: {
                             legend: {
-                                display: false
+                                display: Object.keys(datasets).length > 1
                             },
                             verticalLine: {
                                 index: 1,
-                                label: 'Target Date'
+                                label: "Target Date"
                             }
                         }
                     }
