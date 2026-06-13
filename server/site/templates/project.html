@@ -21,15 +21,31 @@
 
     <script>
         const allDatasets = JSON.parse(document.getElementById("data").dataset.user)["data_sets"];
-        let datasets = JSON.parse(document.getElementById("data").dataset.user)["data_sets"];
+        const colours = ["#5aed97", "#5aedc7", "#5abedc", "#5a97dc", "#5a5edc", "#975aed", "#c75aed", "#dc5aed", "#dc5a97", "#dc5a5a"];
 
         function flipBranch(branch) {
-            console.log(branch);
-            if (Object.keys(datasets).includes(branch)) {
-                datasets = Object.fromEntries(Object.entries(datasets).filter(([k, b]) => b !== branch));
-            } else {
-                datasets[branch] = allDatasets[branch];
+            let removalIndex = -1;
+
+            for (let i = 0; i < chart.data.datasets.length; i++) {
+                if (chart.data.datasets[i].label === branch) {
+                    removalIndex = i;
+                    break;
+                }
             }
+
+            if (removalIndex >= 0) {
+                if (!colours.includes(chart.data.datasets[removalIndex].borderColor)) colours.push(chart.data.datasets[removalIndex].borderColor);
+                chart.data.datasets.splice(removalIndex, 1);
+            } else {
+                chart.data.datasets.push({
+                    label: branch,
+                    data: allDatasets[branch],
+                    borderWidth: 2,
+                    borderColor: colours.length > 0 ? colours.pop() : "#5a97dc",
+                    tension: 0.2
+                });
+            }
+            chart.update();
         }
     </script>
 
@@ -52,7 +68,7 @@
                     button.textContent = branch;
                     button.addEventListener("click", () => {
                         flipBranch(branch);
-                        chart.update();
+                        button.classList.toggle("pressed");
                     });
                     button.color = "white";
                     li.appendChild(button);
@@ -127,18 +143,19 @@
                 const canvas = document.createElement("canvas");
                 graphDiv.appendChild(canvas);
 
-                let chart = new Chart(canvas, {
+                const chart = new Chart(canvas, {
                     type: "line",
                     data: {
                         labels: labels,
-                        datasets: Object.entries(datasets).map(([b, d]) => {
+                        datasets: Object.entries(allDatasets).map(([b, d]) => {
                             return {
                                 label: b,
                                 data: d,
                                 borderWidth: 2,
-                                borderColor: "#5aedc7",
+                                borderColor: colours.length > 0 ? colours.pop() : "#5a97dc",
                                 tension: 0.2
-                        }})
+                            };
+                        })
                     },
                     options: {
                         scales: {
@@ -148,7 +165,7 @@
                         },
                         plugins: {
                             legend: {
-                                display: Object.keys(datasets).length > 1
+                                display: true
                             },
                             verticalLine: {
                                 index: 1,

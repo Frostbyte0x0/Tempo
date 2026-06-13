@@ -18,7 +18,7 @@ canvas {
 
 .graph {
     text-align: left;
-    flex: 0 1 75%;
+    flex: 0 1 50%;
     min-width: 0;
     min-height: 0;
     color: white;
@@ -92,6 +92,11 @@ canvas {
     background: #03382a;
 }
 
+.side-button.pressed {
+    box-shadow: none;
+    background: #02291f;
+}
+
 .back-button {
     padding: 15px;
     margin-left: 30px;
@@ -104,6 +109,11 @@ canvas {
     top: 25px;
     left: 7.5%;
     transform: translateX(-50%);
+    transition: background-color 0.5s ease;
+}
+
+.back-button:hover {
+    background: #033338;
 }
 
 ul {

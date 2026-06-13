@@ -22,7 +22,6 @@ logging.basicConfig(
 # TODO:
 # - Overview tab, show total with list of languages
 # - Finish project view
-#   - Branches
 #   - Time frame selection
 #   - Time frame info
 #   - Commit placement
