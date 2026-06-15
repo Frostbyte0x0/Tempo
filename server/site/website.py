@@ -65,19 +65,44 @@ def project(project):
     project_data = get_data_by_project()
     if project not in project_data:
         project_data = {"total": 0}
-        data_sets = {"main": [0, 0, 0, 0, 0, 0, 0]}
     else:
         project_data = project_data[project]
-        data_sets = get_time_in_week_per_branch(project_data)
 
     language = get_project_language(project_list[project], repo)
     description = get_project_description(project_list[project], repo)
 
+    time_frames = {
+        "day":{
+            "labels": [(datetime.now() - timedelta(hours=i*2)).strftime("%A %Hh") for i in range(11, 1, -1)] + ["2h ago", "Now"],
+            "data_sets": get_time_in_day_per_branch(project_data, [(datetime.now() - timedelta(hours=i*2)).strftime("%D %Hh") for i in range(11, -1, -1)], 2),
+        },
+        "week":{
+            "labels": [(date.today() - timedelta(days=i)).strftime("%A %d") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
+            "data_sets": get_time_in_week_per_branch(project_data, [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, -1, -1)]),
+        },
+        "month":{
+            "labels": [(date.today() - timedelta(days=i*3) + timedelta(days=1)).strftime("%d/%b/%y") for i in range(9, 1, -1)] + ["3d ago", "Today"],
+            "data_sets": get_time_in_month_per_branch(project_data, [(date.today() - timedelta(days=i*3) + timedelta(days=1)).strftime("%D") for i in range(9, -1, -1)], 3),
+        },
+        # "3 months":{
+        #     "labels": [(date.today() - timedelta(days=i*9) + timedelta(days=1)).strftime("%d/%b/%y") for i in range(9, 1, -1)] + ["9d ago", "Today"],
+        #     "data_sets": get_time_in_month_per_branch(project_data, [(date.today() - timedelta(days=i*9) + timedelta(days=1)).strftime("%D") for i in range(9, -1, -1)], 9),
+        # },
+        # "6 months":{
+        #     "labels": [(date.today() - timedelta(days=i*18) + timedelta(days=1)).strftime("%d/%b/%y") for i in range(9, 1, -1)] + ["18d ago", "Today"],
+        #     "data_sets": get_time_in_month_per_branch(project_data, [(date.today() - timedelta(days=i*18) + timedelta(days=1)).strftime("%D") for i in range(9, -1, -1)], 18),
+        # },
+        "year":{
+            "labels": [(date.today() - timedelta(days=i*30)).strftime("%B %y") for i in range(11, -1, -1)],
+            "data_sets": get_time_in_year_per_branch(project_data, [(date.today() - timedelta(days=i*30)).strftime("%m %y") for i in range(11, -1, -1)]),
+        },
+    }
+
     return render_template("project.html", data={
         "project": project,
         "project_data": project_data,
-        "labels": [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
-        "data_sets": data_sets,
+        "frames": list(time_frames.keys()),
+        "time_frames": time_frames,
         "commits_per_branch": repo["commits_per_branch"],
         "language": language,
         "description": description,

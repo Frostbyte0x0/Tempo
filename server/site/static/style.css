@@ -16,9 +16,41 @@ canvas {
     padding: 10px 0;
 }
 
+.time-info {
+    text-align: center;
+    position: relative;
+    flex: 0 1 15%;
+    padding: 25px;
+    background-image: linear-gradient(#031d38, #021529);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    border-radius: 20px;
+    border: 2px solid #021529;
+}
+
+.time-button {
+    padding: 10px;
+    background: linear-gradient(#031d38, #021529);
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+    font-family: comfortaa, sans-serif;
+    width: 100%;
+    transition: background-color 0.5s ease;
+}
+
+.time-button:hover {
+    background: #031d38;
+}
+
+.time-button.pressed {
+    box-shadow: none;
+    background: #021529;
+}
+
 .graph {
     text-align: left;
-    flex: 0 1 50%;
+    flex: 0 1 55%;
     min-width: 0;
     min-height: 0;
     color: white;

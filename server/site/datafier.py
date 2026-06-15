@@ -1,5 +1,6 @@
 import json
-from datetime import date, timedelta
+import math
+from datetime import date, timedelta, datetime
 from pathlib import Path
 
 from github import Github
@@ -75,16 +76,75 @@ def get_time_in_week(project: dict) -> list[float]:
     return list(result_data.values())
 
 
-def get_time_in_week_per_branch(project: dict) -> dict[str, list[float]]:
+def get_time_in_day_per_branch(project: dict, labels: list, hours: int) -> dict[str, list[float]]:
     per_branch = project["per_branch"]
 
     result = {}
     for branch, branch_data in per_branch.items():
-        result_data = {(date.today() - timedelta(days=i)).strftime("%D"): 0 for i in range(6, -1, -1)}
+        result_data = {l: 0 for l in labels}
         for date_key, data in branch_data.items():
+            if date_key == "total": continue
+            day = date_key.split(" ")[0]
+            hour = str(math.ceil(int(date_key.split(" ")[1][:-1]) / hours) * hours)
+            if len(hour) == 1: hour = "0" + hour
+            key = (datetime.strptime(day + " " + hour, "%m/%d/%y %H") + timedelta(hours=int(datetime.now().strftime("%H")) % 2)).strftime("%D %Hh")
+            if key in result_data.keys():
+                result_data[key] += data
+        result[branch] = list(result_data.values())
+
+    return result
+
+
+def get_time_in_week_per_branch(project: dict, labels: list) -> dict[str, list[float]]:
+    per_branch = project["per_branch"]
+
+    result = {}
+    for branch, branch_data in per_branch.items():
+        result_data = {l: 0 for l in labels}
+        for date_key, data in branch_data.items():
+            if date_key == "total": continue
             day = date_key.split(" ")[0]
             if day in result_data.keys():
                 result_data[day] += data
+        result[branch] = list(result_data.values())
+
+    return result
+
+
+def get_time_in_month_per_branch(project: dict, labels: list, days: int) -> dict[str, list[float]]:
+    per_branch = project["per_branch"]
+
+    result = {}
+    for branch, branch_data in per_branch.items():
+        result_data = {l: 0 for l in labels}
+        for date_key, data in branch_data.items():
+            if date_key == "total": continue
+            date_info = date_key.split(" ")[0]
+            day = str(math.ceil(int(date_info.split("/")[1]) / days) * days)
+            if len(day) == 1: day = "0" + day
+            key = (datetime.strptime(date_info.split("/")[0] + "/" + day + "/" + date_info.split("/")[2], "%m/%d/%y") +
+                   timedelta(days=int(day) % days)).strftime("%D")
+            if key in result_data.keys():
+                result_data[key] += data
+        result[branch] = list(result_data.values())
+
+    return result
+
+
+def get_time_in_year_per_branch(project: dict, labels: list) -> dict[str, list[float]]:
+    per_branch = project["per_branch"]
+
+    result = {}
+    for branch, branch_data in per_branch.items():
+        result_data = {l: 0 for l in labels}
+        for date_key, data in branch_data.items():
+            if date_key == "total": continue
+            date = date_key.split(" ")[0]
+            month = date.split("/")[0]
+            if len(month) == 1: month = "0" + month
+            key = month + " " + date.split("/")[2]
+            if key in result_data.keys():
+                result_data[key] += data
         result[branch] = list(result_data.values())
 
     return result
