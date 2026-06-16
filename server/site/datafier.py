@@ -1,6 +1,6 @@
 import json
 import math
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta, datetime, time
 from pathlib import Path
 
 from github import Github
@@ -82,14 +82,17 @@ def get_time_in_day_per_branch(project: dict, labels: list, hours: int) -> dict[
     result = {}
     for branch, branch_data in per_branch.items():
         result_data = {l: 0 for l in labels}
+
         for date_key, data in branch_data.items():
             if date_key == "total": continue
             day = date_key.split(" ")[0]
             hour = str(math.ceil(int(date_key.split(" ")[1][:-1]) / hours) * hours)
             if len(hour) == 1: hour = "0" + hour
+
             key = (datetime.strptime(day + " " + hour, "%m/%d/%y %H") + timedelta(hours=int(datetime.now().strftime("%H")) % 2)).strftime("%D %Hh")
             if key in result_data.keys():
                 result_data[key] += data
+
         result[branch] = list(result_data.values())
 
     return result
@@ -101,11 +104,13 @@ def get_time_in_week_per_branch(project: dict, labels: list) -> dict[str, list[f
     result = {}
     for branch, branch_data in per_branch.items():
         result_data = {l: 0 for l in labels}
+
         for date_key, data in branch_data.items():
             if date_key == "total": continue
             day = date_key.split(" ")[0]
             if day in result_data.keys():
                 result_data[day] += data
+
         result[branch] = list(result_data.values())
 
     return result
@@ -117,15 +122,18 @@ def get_time_in_month_per_branch(project: dict, labels: list, days: int) -> dict
     result = {}
     for branch, branch_data in per_branch.items():
         result_data = {l: 0 for l in labels}
+
         for date_key, data in branch_data.items():
             if date_key == "total": continue
             date_info = date_key.split(" ")[0]
             day = str(math.ceil(int(date_info.split("/")[1]) / days) * days)
             if len(day) == 1: day = "0" + day
+
             key = (datetime.strptime(date_info.split("/")[0] + "/" + day + "/" + date_info.split("/")[2], "%m/%d/%y") +
-                   timedelta(days=int(day) % days)).strftime("%D")
+                   timedelta(days=int(day) % days) + timedelta(days=int(datetime.now().strftime("%d")) % days)).strftime("%D")
             if key in result_data.keys():
                 result_data[key] += data
+
         result[branch] = list(result_data.values())
 
     return result
@@ -137,17 +145,67 @@ def get_time_in_year_per_branch(project: dict, labels: list) -> dict[str, list[f
     result = {}
     for branch, branch_data in per_branch.items():
         result_data = {l: 0 for l in labels}
+
         for date_key, data in branch_data.items():
             if date_key == "total": continue
             date = date_key.split(" ")[0]
             month = date.split("/")[0]
             if len(month) == 1: month = "0" + month
+
             key = month + " " + date.split("/")[2]
             if key in result_data.keys():
                 result_data[key] += data
+
         result[branch] = list(result_data.values())
 
     return result
+
+
+def get_commits_data_set(commits_per_branch: dict[str, list[dict[str, str]]], dates: list[datetime]) -> dict[str, dict[float, dict[str, str]]]:
+    result = {}
+    h_step = (dates[1] - dates[0]).total_seconds() / 3600
+
+    for branch, commits in commits_per_branch.items():
+        result_data = {}
+
+        for commit in commits:
+            commit_date = datetime.strptime(commit["date"], "%Y-%m-%d %H:%M:%S")
+            step = (commit_date - dates[0]).total_seconds() / 3600
+
+            if step < 0 or step > (dates[-1] - dates[0]).total_seconds() / 3600:
+                continue
+
+            index = step / h_step
+            result_data[index] = commit
+
+        result[branch] = result_data
+
+    return result
+
+
+def get_project_data_set(project_data: dict, commits_per_branch: dict) -> dict[str, dict]:
+    return {
+        "day": {
+            "labels": [(datetime.now() - timedelta(hours=i*2)).strftime("%A %Hh") for i in range(11, 1, -1)] + ["2h ago", "Now"],
+            "data_sets": get_time_in_day_per_branch(project_data, [(datetime.now() - timedelta(hours=i*2)).strftime("%D %Hh") for i in range(11, -1, -1)], 2),
+            "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(hours=i*2), time(0, 0)) for i in range(11, -1, -1)]),
+        },
+        "week": {
+            "labels": [(date.today() - timedelta(days=i)).strftime("%A %d") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
+            "data_sets": get_time_in_week_per_branch(project_data, [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, -1, -1)]),
+            "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(days=i), time(0, 0)) for i in range(6, -1, -1)]),
+        },
+        "month": {
+            "labels": [(date.today() - timedelta(days=i*3)).strftime("%d/%b/%y") for i in range(9, 1, -1)] + ["3d ago", "Today"],
+            "data_sets": get_time_in_month_per_branch(project_data, [(date.today() - timedelta(days=i*3)).strftime("%D") for i in range(9, -1, -1)], 3),
+            "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(days=i*3), time(0, 0)) for i in range(9, -1, -1)]),
+        },
+        "year": {
+            "labels": [(date.today() - timedelta(days=i*30)).strftime("%B %y") for i in range(11, -1, -1)],
+            "data_sets": get_time_in_year_per_branch(project_data, [(date.today() - timedelta(days=i*30)).strftime("%m %y") for i in range(11, -1, -1)]),
+            "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(days=i*30), time(0, 0)) for i in range(11, -1, -1)]),
+        },
+    }
 
 
 def get_repo(user: str, name: str) -> tuple[Repository | None, bool]:
@@ -174,7 +232,7 @@ def get_repo_info(remote_url: str) -> tuple[dict, bool]:
             "found": True,
             "language": repo.language,
             "description": repo.description,
-            "commit_number": repo.get_commits().totalCount,
+            "commit_number": sum([repo.get_commits(sha=branch.name).totalCount for branch in repo.get_branches()]),
             "commits_per_branch": {branch.name: [{
                 "author": commit.commit.author.name,
                 "date": commit.commit.author.date.strftime("%Y-%m-%d %H:%M:%S"),

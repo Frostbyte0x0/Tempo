@@ -20,7 +20,7 @@
     </button>
 
     <script>
-        const allDatasets = JSON.parse(document.getElementById("data").dataset.user)["time_frames"];
+        const allDatasets = JSON.parse(document.getElementById("data").dataset.user)["data_sets"];
         const colours = ["#5aed97", "#5aedc7", "#5abedc", "#5a97dc", "#5a5edc", "#975aed", "#c75aed", "#dc5aed", "#dc5a97", "#dc5a5a"];
         const showingBranches = Object.keys(allDatasets["week"]["data_sets"]);
         let timeFrame = "week";
@@ -40,7 +40,7 @@
                 if (!colours.includes(d)) colours.push(d);
             }
 
-            chart.data.labels = allDatasets[timeFrame]["labels"];
+            chart.data.labels = JSON.parse(document.getElementById("data").dataset.user)["data_sets"][timeFrame]["labels"];
 
             for (const branch of Object.keys(allDatasets[timeFrame]["data_sets"])) {
                 if (!showingBranches.includes(branch)) continue;
@@ -52,8 +52,9 @@
                     tension: 0.2
                 });
             }
-
+            console.log(chart.data.datasets);
             chart.update();
+            console.log(chart.data.datasets);
         }
     </script>
 
@@ -66,8 +67,7 @@
             <script>
                 const listParent = document.getElementById("list");
 
-                const commits = JSON.parse(document.getElementById("data").dataset.user)["commits_per_branch"];
-                const branches = Object.keys(commits);
+                const branches = JSON.parse(document.getElementById("data").dataset.user)["branches"];
 
                 branches.forEach(branch => {
                     const li = document.createElement("li");
@@ -77,7 +77,9 @@
                     button.addEventListener("click", () => {
                         flipBranch(branch);
                         button.classList.toggle("pressed");
+                        //updateCommits();
                         updateChart();
+                        updateTimeInfo();
                     });
                     button.color = "white";
                     li.appendChild(button);
@@ -113,45 +115,56 @@
                 document.getElementById("top-a").textContent = data["project"] + " [" + data["language"] + "], ";
                 document.getElementById("top-a").appendChild(link);
                 document.getElementById("middle-a").textContent = Math.floor(t / 60) + " hours, " + t % 60 + " minutes, " +
-                    data["commit_number"] + " commits in " + Object.keys(data["commits_per_branch"]).length + " branches";
+                    data["commit_number"] + " commits in " + data["branches"].length + " branches";
                 document.getElementById("bottom-a").textContent = data["description"];
 
                 const verticalLinePlugin = {
-                    id: "verticalLine",
+                    id: "verticalLines",
                     afterDraw(chart, args, pluginOptions) {
+                        chart.data.labels = JSON.parse(document.getElementById("data").dataset.user)["data_sets"][timeFrame]["labels"];
                         const xScale = chart.scales.x;
-                        if (!xScale || pluginOptions.index === undefined || pluginOptions.index === null) {
-                            return;
+                        console.log(chart.options.plugins.verticalLines);
+                        console.log(chart.data.labels);
+                        console.log(allDatasets[timeFrame]["labels"]);
+                        console.log(JSON.parse(document.getElementById("data").dataset.user)["data_sets"][timeFrame]["labels"]);
+
+                        for (const pluginOption of pluginOptions) {
+                            if (!xScale || pluginOption.index === undefined || pluginOption.index === null) {
+                                return;
+                            }
+
+                            const x = xScale.getPixelForValue(pluginOption.index) - 300;
+                            const { ctx, chartArea } = chart;
+                            console.log(x);
+
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(x, chartArea.top);
+                            ctx.lineTo(x, chartArea.bottom);
+                            ctx.lineWidth = 2;
+                            ctx.strokeStyle = "#5aedc7";
+                            ctx.stroke();
+
+                            if (pluginOption.label) {
+                                console.log(pluginOption.label);
+                                ctx.fillStyle = "#5aedc7";
+                                ctx.font = "10px comfortaa, sans-serif";
+                                ctx.textAlign = "left";
+                                ctx.fillText(pluginOption.label, x + 6, chartArea.top + 14);
+                            }
+
+                            ctx.restore();
                         }
-
-                        const x = xScale.getPixelForValue(pluginOptions.index);
-                        const { ctx, chartArea } = chart;
-
-                        ctx.save();
-                        ctx.beginPath();
-                        ctx.moveTo(x, chartArea.top);
-                        ctx.lineTo(x, chartArea.bottom);
-                        ctx.lineWidth = 2;
-                        ctx.strokeStyle = "#5aedc7";
-                        ctx.stroke();
-
-                        if (pluginOptions.label) {
-                            ctx.fillStyle = "#5aedc7";
-                            ctx.font = "14px comfortaa, sans-serif";
-                            ctx.textAlign = "left";
-                            ctx.fillText(pluginOptions.label, x + 6, chartArea.top + 14);
-                        }
-
-                        ctx.restore();
                     }
                 };
 
                 Chart.register(verticalLinePlugin);
 
                 const canvas = document.createElement("canvas");
+                canvas.id = "graph-canvas";
                 graphDiv.appendChild(canvas);
 
-                const chart = new Chart(canvas, {
+                let chart = new Chart(canvas, {
                     type: "line",
                     data: {
                         labels: allDatasets["week"]["labels"],
@@ -175,10 +188,7 @@
                             legend: {
                                 display: true
                             },
-                            verticalLine: {
-                                index: 1,
-                                label: "Target Date"
-                            }
+                            verticalLines: []
                         }
                     }
                 });
@@ -188,12 +198,11 @@
         <div class="time-info" id="time-info">
             <ul id="time-list" style="margin: 0;">
                 <li class="list-item">
-                    <a class="list-item" style="font-size: 25px; color: #5a73ed">In the past </a>
-                    <a id="time-info-title" class="list-item" style="font-size: 25px; color: #5a73ed">week</a>
-                    <a class="list-item" style="font-size: 25px; color: #5a73ed">:</a>
+                    <a class="list-item" style="font-size: 23px; color: #5a73ed">In the past</a>
+                    <a id="time-info-title" class="list-item" style="font-size: 23px; color: #5a73ed">week:</a>
                 </li>
                 <li class="list-item">
-                    <a class="list-item">Nb of commits: </a>
+                    <a class="list-item">Commits: </a>
                     <a id="time-info-commits" class="list-item"></a>
                 </li>
                 <li class="list-item">
@@ -203,7 +212,7 @@
             </ul>
         </div>
         <script>
-            const frames = JSON.parse(document.getElementById("data").dataset.user)["frames"];
+            const frames = JSON.parse(document.getElementById("data").dataset.user)["time_frames"];
 
             frames.forEach(time => {
                 const li = document.createElement("li");
@@ -214,22 +223,115 @@
                 if (time === "week") button.classList.add("pressed");
                 button.addEventListener("click", () => {
                     timeFrame = time;
+                    //updateCommits();
                     updateChart();
                     button.classList.add("pressed");
                     for (const btn of document.getElementsByClassName("time-button")) {
                         if (btn.textContent !== text) btn.classList.remove("pressed");
                     }
-                    document.getElementById("time-info-title").textContent = time;
-                    let d = 0;
-                    chart.data.datasets[0].data.forEach(t => d += t);
-                    document.getElementById("time-info-time").textContent = d.toString() + " min";
-                    document.getElementById("time-info").style.height = document.getElementById("time-list").clientHeight + 20 + "px";
+                    document.getElementById("time-info-title").textContent = time + ":";
+                    updateTimeInfo();
                 });
                 button.color = "white";
                 li.appendChild(button);
                 li.classList.add("list-item");
                 document.getElementById("time-list").appendChild(li);
             });
+
+            function updateTimeInfo() {
+                let d = 0;
+                chart.data.datasets.forEach(set => set.data.forEach(t => d += t));
+                document.getElementById("time-info-time").textContent = d.toString() + " min";
+                let c = 0;
+                chart.data.datasets.forEach(set => {
+                    if (Object.keys(allDatasets[timeFrame]["commits"]).includes(set.label)) {
+                        c += Object.keys(allDatasets[timeFrame]["commits"][set.label]).length;
+                    }
+                });
+                document.getElementById("time-info-commits").textContent = c.toString();
+            }
+            updateTimeInfo();
+
+            // const li = document.createElement("li");
+            // const checkBox = document.createElement("input");
+            // const checkLabel = document.createElement("label");
+            // checkBox.type = "checkbox";
+            // checkBox.checked = false;
+            // checkBox.id = "showCommits";
+            // checkLabel.classList.add("check");
+            // checkBox.classList.add("check");
+            // checkLabel.htmlFor = "showCommits";
+            // checkLabel.textContent = "Show commits";
+            // checkBox.addEventListener("change", () => {
+            //     updateCommits();
+            // });
+            //
+            // function updateCommits() {
+            //     console.log("Clicked");
+            //
+            //     let verticalLines = [];
+            //     if (checkBox.checked) {
+            //         const commitsInFrame = allDatasets[timeFrame]["commits"];
+            //         console.log(commitsInFrame);
+            //         chart.data.datasets.forEach(set => {
+            //             if (Object.keys(commitsInFrame).includes(set.label)) {
+            //                 for (const c of Object.keys(commitsInFrame[set.label])) {
+            //                     verticalLines.push({
+            //                         label: commitsInFrame[set.label][c]["message"],
+            //                         index: c,
+            //                     });
+            //                     console.log(c);
+            //                     console.log(commitsInFrame[set.label]);
+            //                 }
+            //             }
+            //         });
+            //     }
+            //
+            //     const L = chart.data.datasets.length;
+            //     for (let i = 0; i < L; i++) {
+            //         const d = chart.data.datasets.pop().borderColor;
+            //         if (!colours.includes(d)) colours.push(d);
+            //     }
+            //     chart.destroy();
+            //     chart = new Chart(canvas, {
+            //         type: "line",
+            //         data: {
+            //             labels: allDatasets[timeFrame]["labels"],
+            //             datasets: Object.entries(allDatasets[timeFrame]["data_sets"]).map(([b, d]) => {
+            //                 return {
+            //                     label: b,
+            //                     data: d,
+            //                     borderWidth: 2,
+            //                     borderColor: colours.length > 0 ? colours.pop() : "#5a97dc",
+            //                     tension: 0.2
+            //                 };
+            //             })
+            //         },
+            //         options: {
+            //             scales: {
+            //                 y: {
+            //                     beginAtZero: true
+            //                 }
+            //             },
+            //             plugins: {
+            //                 legend: {
+            //                     display: true
+            //                 },
+            //                 verticalLines: verticalLines
+            //             }
+            //         }
+            //     });
+            //
+            //     console.log(chart.options.plugins.verticalLines);
+            //     chart.update();
+            //     console.log(chart.options.plugins.verticalLines);
+            // }
+            //
+            // li.appendChild(checkBox);
+            // li.appendChild(checkLabel);
+            // li.classList.add("list-item");
+            // document.getElementById("time-list").appendChild(li);
+
             document.getElementById("time-info").style.height = document.getElementById("time-list").clientHeight + 20 + "px";
         </script>
 
