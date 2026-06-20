@@ -4,13 +4,19 @@ import socket
 import struct
 import sys
 
-# Configure logging to save to a file
+import github_profile_updater
+
+
+def get_settings() -> dict:
+    with open("settings.json", "r") as f:
+        return json.load(f)
+
 # noinspection PyArgumentList
 logging.basicConfig(
     encoding='utf-8',
-    level=logging.DEBUG,
+    level=get_settings()["logging_level"],
     handlers=[
-        logging.FileHandler("server.log", mode="w"),
+        logging.FileHandler(get_settings()["log_file"], mode="w"),
         logging.StreamHandler(sys.stdout)
     ],
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -66,6 +72,9 @@ def wait_and_manage_connection():
                     data[device_name] = new_data
                     write_data(data)
                     logging.info(f"Wrote data to {device_name}")
+                    if get_settings()["auto_sync_github"]:
+                        logging.info(f"Updating github profile")
+                        github_profile_updater.update_profile()
 
             c.close()
     finally:

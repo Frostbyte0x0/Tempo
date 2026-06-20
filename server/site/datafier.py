@@ -8,7 +8,7 @@ from github.Repository import Repository
 
 try:
     with open(Path(__file__).resolve().parent.parent / "key.txt", "r") as f:
-        key = f.read().strip()
+        key = f.readlines()[0].strip()
     if key != "":
         g = Github(key)
     else:
@@ -44,9 +44,25 @@ def read_data() -> dict:
         return json.load(f)
 
 
+def read_key() -> str:
+    with open(Path(__file__).resolve().parent.parent / "key.txt", "r") as f:
+        return f.readlines()[0].strip()
+
+def read_user() -> str:
+    with open(Path(__file__).resolve().parent.parent / "key.txt", "r") as f:
+        return f.readlines()[1].strip()
+
 def write_key(key: str):
+    with open(Path(__file__).resolve().parent.parent / "key.txt", "r") as f:
+        user = f.readlines()[1].strip()
     with open(Path(__file__).resolve().parent.parent / "key.txt", "w") as f:
-        f.write(key.strip())
+        f.write(key.strip() + "\n" + user.strip())
+
+def write_user(user: str):
+    with open(Path(__file__).resolve().parent.parent / "key.txt", "r") as f:
+        key = f.readlines()[0].strip()
+    with open(Path(__file__).resolve().parent.parent / "key.txt", "w") as f:
+        f.write(key.strip() + "\n" + user.strip())
 
 
 def get_data_by_project() -> dict:
@@ -60,7 +76,7 @@ def get_data_by_project() -> dict:
     return result
 
 
-def get_time_in_week(project: dict) -> list[float]:
+def get_time_in_week_combined(project: dict) -> list[float]:
     per_branch = project["per_branch"]
     data = {}
 
@@ -76,14 +92,12 @@ def get_time_in_week(project: dict) -> list[float]:
     return list(result_data.values())
 
 
-def get_time_in_day_per_branch(project: dict, labels: list, hours: int) -> dict[str, list[float]]:
-    per_branch = project["per_branch"]
-
+def get_time_in_day(projects: dict, labels: list, hours: int) -> dict[str, list[float]]:
     result = {}
-    for branch, branch_data in per_branch.items():
+    for project_key, project_data in projects.items():
         result_data = {l: 0 for l in labels}
 
-        for date_key, data in branch_data.items():
+        for date_key, data in project_data.items():
             if date_key == "total": continue
             day = date_key.split(" ")[0]
             hour = str(math.ceil(int(date_key.split(" ")[1][:-1]) / hours) * hours)
@@ -93,37 +107,33 @@ def get_time_in_day_per_branch(project: dict, labels: list, hours: int) -> dict[
             if key in result_data.keys():
                 result_data[key] += data
 
-        result[branch] = list(result_data.values())
+        result[project_key] = list(result_data.values())
 
     return result
 
 
-def get_time_in_week_per_branch(project: dict, labels: list) -> dict[str, list[float]]:
-    per_branch = project["per_branch"]
-
+def get_time_in_week(projects: dict, labels: list) -> dict[str, list[float]]:
     result = {}
-    for branch, branch_data in per_branch.items():
+    for project_key, project_data in projects.items():
         result_data = {l: 0 for l in labels}
 
-        for date_key, data in branch_data.items():
+        for date_key, data in project_data.items():
             if date_key == "total": continue
             day = date_key.split(" ")[0]
             if day in result_data.keys():
                 result_data[day] += data
 
-        result[branch] = list(result_data.values())
+        result[project_key] = list(result_data.values())
 
     return result
 
 
-def get_time_in_month_per_branch(project: dict, labels: list, days: int) -> dict[str, list[float]]:
-    per_branch = project["per_branch"]
-
+def get_time_in_month(projects: dict, labels: list, days: int) -> dict[str, list[float]]:
     result = {}
-    for branch, branch_data in per_branch.items():
+    for project_key, project_data in projects.items():
         result_data = {l: 0 for l in labels}
 
-        for date_key, data in branch_data.items():
+        for date_key, data in project_data.items():
             if date_key == "total": continue
             date_info = date_key.split(" ")[0]
             day = str(math.ceil(int(date_info.split("/")[1]) / days) * days)
@@ -134,19 +144,17 @@ def get_time_in_month_per_branch(project: dict, labels: list, days: int) -> dict
             if key in result_data.keys():
                 result_data[key] += data
 
-        result[branch] = list(result_data.values())
+        result[project_key] = list(result_data.values())
 
     return result
 
 
-def get_time_in_year_per_branch(project: dict, labels: list) -> dict[str, list[float]]:
-    per_branch = project["per_branch"]
-
+def get_time_in_year(projects: dict, labels: list) -> dict[str, list[float]]:
     result = {}
-    for branch, branch_data in per_branch.items():
+    for project_key, project_data in projects.items():
         result_data = {l: 0 for l in labels}
 
-        for date_key, data in branch_data.items():
+        for date_key, data in project_data.items():
             if date_key == "total": continue
             date = date_key.split(" ")[0]
             month = date.split("/")[0]
@@ -156,7 +164,7 @@ def get_time_in_year_per_branch(project: dict, labels: list) -> dict[str, list[f
             if key in result_data.keys():
                 result_data[key] += data
 
-        result[branch] = list(result_data.values())
+        result[project_key] = list(result_data.values())
 
     return result
 
@@ -187,24 +195,152 @@ def get_project_data_set(project_data: dict, commits_per_branch: dict) -> dict[s
     return {
         "day": {
             "labels": [(datetime.now() - timedelta(hours=i*2)).strftime("%A %Hh") for i in range(11, 1, -1)] + ["2h ago", "Now"],
-            "data_sets": get_time_in_day_per_branch(project_data, [(datetime.now() - timedelta(hours=i*2)).strftime("%D %Hh") for i in range(11, -1, -1)], 2),
+            "data_sets": get_time_in_day(project_data["per_branch"], [(datetime.now() - timedelta(hours=i*2)).strftime("%D %Hh") for i in range(11, -1, -1)], 2),
             "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(hours=i*2), time(0, 0)) for i in range(11, -1, -1)]),
         },
         "week": {
             "labels": [(date.today() - timedelta(days=i)).strftime("%A %d") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
-            "data_sets": get_time_in_week_per_branch(project_data, [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, -1, -1)]),
+            "data_sets": get_time_in_week(project_data["per_branch"], [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, -1, -1)]),
             "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(days=i), time(0, 0)) for i in range(6, -1, -1)]),
         },
         "month": {
             "labels": [(date.today() - timedelta(days=i*3)).strftime("%d/%b/%y") for i in range(9, 1, -1)] + ["3d ago", "Today"],
-            "data_sets": get_time_in_month_per_branch(project_data, [(date.today() - timedelta(days=i*3)).strftime("%D") for i in range(9, -1, -1)], 3),
+            "data_sets": get_time_in_month(project_data["per_branch"], [(date.today() - timedelta(days=i*3)).strftime("%D") for i in range(9, -1, -1)], 3),
             "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(days=i*3), time(0, 0)) for i in range(9, -1, -1)]),
         },
         "year": {
             "labels": [(date.today() - timedelta(days=i*30)).strftime("%B %y") for i in range(11, -1, -1)],
-            "data_sets": get_time_in_year_per_branch(project_data, [(date.today() - timedelta(days=i*30)).strftime("%m %y") for i in range(11, -1, -1)]),
+            "data_sets": get_time_in_year(project_data["per_branch"], [(date.today() - timedelta(days=i*30)).strftime("%m %y") for i in range(11, -1, -1)]),
             "commits": get_commits_data_set(commits_per_branch, [datetime.combine(date.today() - timedelta(days=i*30), time(0, 0)) for i in range(11, -1, -1)]),
         },
+    }
+
+
+def get_time_per_language(project_data: dict, repos: dict) -> dict[str, list[dict]]:
+    result = {}
+    for project, data in project_data.items():
+        language = get_project_language(read_project_list()[project], repos[project])
+        combined_branches = {}
+        for branch in data["per_branch"].values():
+            combined_branches = combine(combined_branches, branch)
+        if language not in result.keys():
+            result[language] = {}
+        result[language] = combine(combined_branches, result[language])
+
+    return result
+
+
+def get_overview_data_set(project_data: dict) -> dict[str, dict]:
+    return {
+        "day": {
+            "labels": [(datetime.now() - timedelta(hours=i*2)).strftime("%A %Hh") for i in range(11, 1, -1)] + ["2h ago", "Now"],
+            "data_sets": get_time_in_day(project_data, [(datetime.now() - timedelta(hours=i*2)).strftime("%D %Hh") for i in range(11, -1, -1)], 2),
+        },
+        "week": {
+            "labels": [(date.today() - timedelta(days=i)).strftime("%A %d") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
+            "data_sets": get_time_in_week(project_data, [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, -1, -1)]),
+        },
+        "month": {
+            "labels": [(date.today() - timedelta(days=i*3)).strftime("%d/%b/%y") for i in range(9, 1, -1)] + ["3d ago", "Today"],
+            "data_sets": get_time_in_month(project_data, [(date.today() - timedelta(days=i*3)).strftime("%D") for i in range(9, -1, -1)], 3),
+        },
+        "year": {
+            "labels": [(date.today() - timedelta(days=i*30)).strftime("%B %y") for i in range(11, -1, -1)],
+            "data_sets": get_time_in_year(project_data, [(date.today() - timedelta(days=i*30)).strftime("%m %y") for i in range(11, -1, -1)]),
+        },
+    }
+
+
+def get_commit_number(repos, projects_and_languages: dict[str, str], begin: datetime) -> dict[str, int]:
+    result = {}
+
+    for project, language in projects_and_languages.items():
+        if project not in repos.keys(): continue
+
+        for branch, commits in repos[project]["commits_per_branch"].items():
+
+            for commit in commits:
+                commit_date = datetime.strptime(commit["date"], "%Y-%m-%d %H:%M:%S")
+                step = (commit_date - begin).total_seconds()
+
+                if language not in result.keys():
+                    result[language] = 0
+
+                if step >= 0:
+                    result[language] += 1
+
+    return result
+
+
+def get_project_number(project_data: dict, days: int) -> int:
+    total = 0
+    for project, data in project_data.items():
+        for branch, times in data["per_branch"].items():
+            if branch == "total": continue
+            latest_update = datetime.strptime(list(times.keys())[-1], "%m/%d/%y %Hh")
+            delta = (datetime.now() - latest_update).total_seconds() / (60 * 60 * 24)
+            if delta < days:
+                total += 1
+                break
+    return total
+
+
+def get_most_used_language(project_data: dict, repos: dict, days: int) -> str:
+    language_time = {}
+    for project, data in project_data.items():
+        for branch, times in data["per_branch"].items():
+            if branch == "total": continue
+            latest_update = datetime.strptime(list(times.keys())[-1], "%m/%d/%y %Hh")
+            delta = (datetime.now() - latest_update).total_seconds() / (60 * 60 * 24)
+            if delta < days:
+                language = get_project_language(read_project_list()[project], repos[project])
+                total_time = sum(times.values())
+                if language not in language_time.keys():
+                    language_time[language] = 0
+                language_time[language] += total_time
+
+    most_used_language = "Unknown"
+    max_time = 0
+    for language, time in language_time.items():
+        if time > max_time:
+            most_used_language = language
+            max_time = time
+
+    return most_used_language
+
+
+def get_project_with_most_time(project_data: dict, days: int) -> str:
+    project_time = {}
+    for project, data in project_data.items():
+        for branch, times in data["per_branch"].items():
+            if branch == "total": continue
+            latest_update = datetime.strptime(list(times.keys())[-1], "%m/%d/%y %Hh")
+            delta = (datetime.now() - latest_update).total_seconds() / (60 * 60 * 24)
+            if delta < days:
+                total_time = sum(times.values())
+                project_time[project] = total_time
+
+    most_used_project = "Unknown"
+    max_time = 0
+    for project, time in project_time.items():
+        if time > max_time:
+            most_used_project = project
+            max_time = time
+
+    return most_used_project
+
+
+def get_info_per_time_frame(data_by_project: dict, overview_data_sets: dict, repos: dict, projects_and_languages: dict[str, str]) -> dict:
+    return {
+        time: {
+            "total_time": sum(sum(times) for times in overview_data_sets[time]["data_sets"].values()),
+            "average_per_day": round(sum(sum(times) for times in overview_data_sets[time]["data_sets"].values()) / days),
+            "project_nb": get_project_number(data_by_project, days),
+            "commit_nb": get_commit_number(repos, projects_and_languages, datetime.now() - timedelta(days=days)),
+            "total_commit_nb": sum([t for time, t in get_commit_number(repos, projects_and_languages, datetime.now() - timedelta(days=days)).items()]),
+            "most_used_language": get_most_used_language(data_by_project, repos, days),
+            "project_with_most_time": get_project_with_most_time(data_by_project, days),
+        } for time, days in {"day": 1, "week": 7, "month": 30, "year": 365}.items()
     }
 
 
@@ -224,20 +360,22 @@ def get_repo_info(remote_url: str) -> tuple[dict, bool]:
     info = remote_url[:-4].split("/")
 
     if info[-1] in d.keys():
-        return d[info[-1]], False
+        if datetime.now() - datetime.strptime(d[info[-1]]["last_updated"], "%Y-%m-%d %H:%M:%S") < timedelta(days=1):
+            return d[info[-1]], False
 
     repo, rate_limit_reached = get_repo(info[-2], info[-1])
     if repo:
         repo_info = {
             "found": True,
             "language": repo.language,
+            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "description": repo.description,
             "commit_number": sum([repo.get_commits(sha=branch.name).totalCount for branch in repo.get_branches()]),
             "commits_per_branch": {branch.name: [{
                 "author": commit.commit.author.name,
                 "date": commit.commit.author.date.strftime("%Y-%m-%d %H:%M:%S"),
                 "message": commit.commit.message.splitlines()[0],
-            } for commit in repo.get_commits(sha=branch.name)[:50]]
+            } for commit in repo.get_commits(sha=branch.name)[:100]]
             for branch in repo.get_branches()},
         }
     else:

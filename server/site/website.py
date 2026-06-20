@@ -19,12 +19,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-# TODO:
-# - Overview tab, show total with list of languages
-# - Link with github info and sync
-# - Check PAT key github
-# - Sorting on list page ?
-
 
 @app.route("/")
 def main():
@@ -35,7 +29,7 @@ def main():
     project_list = read_project_list()
     project_data = get_data_by_project()
     repos, needs_key = read_and_update_repo_info({project: project_list[project]["remote_url"] for project in project_data.keys()})
-    data_sets = {project: get_time_in_week(project_data[project]) for project in project_data.keys()}
+    data_sets = {project: get_time_in_week_combined(project_data[project]) for project in project_data.keys()}
     languages = {project: get_project_language(project_list[project], repos[project]) for project in project_data.keys()}
     descriptions = {project: get_project_description(project_list[project], repos[project], 45) for project in project_data.keys()}
 
@@ -68,8 +62,6 @@ def project(project):
     description = get_project_description(project_list[project], repo)
 
     data_sets = get_project_data_set(project_data, repo["commits_per_branch"])
-    print(data_sets)
-    print(data_sets["month"]["labels"])
 
     return render_template("project.html", data={
         "project": project,
@@ -88,16 +80,21 @@ def project(project):
 @app.route("/overview")
 def overview():
     project_list = read_project_list()
-    project_data = get_data_by_project()["Tempo"]
+    project_data = get_data_by_project()
 
     repos, needs_key = read_and_update_repo_info({project: project_list[project]["remote_url"] for project in project_data.keys()})
 
-    data_set = get_time_in_week(project_data)
+    project_per_language = get_time_per_language(project_data, repos)
+    data_sets = get_overview_data_set(project_per_language)
+
+    info_per_time_frame = get_info_per_time_frame(project_data, data_sets, repos, {project: get_project_language(project_list[project], repos[project]) for project in project_data.keys()})
 
     return render_template("overview.html", data={
         "project_data": project_data,
-        "labels": [(date.today() - timedelta(days=i)).strftime("%D") for i in range(6, 1, -1)] + ["Yesterday", "Today"],
-        "data_set": data_set,
+        "time_frames": list(data_sets.keys()),
+        "languages": list(data_sets["week"]["data_sets"].keys()),
+        "data_sets": data_sets,
+        "info_per_time_frame": info_per_time_frame,
         "needs_key": needs_key,
     })
 
@@ -105,4 +102,4 @@ if __name__ == "__main__":
     try:
         app.run(debug=True)
     except Exception as e:
-        logging.exception(e)
+        logging.exception(e, exc_info=True)

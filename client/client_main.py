@@ -11,6 +11,20 @@ import logging
 
 # TODO:
 # - Commands
+#   - Client
+#     - Run
+#     - Stop
+#     - Is running
+#     - Try sync
+#     - Change settings
+#   - Server
+#     - Run
+#     - Stop
+#     - Is running
+#   - Website
+#     - Run
+#     - Stop
+#     - Is running
 
 
 def get_settings() -> dict:
@@ -125,7 +139,7 @@ def sync(data: dict, is_project_list:bool = False):
         c.close()
 
 
-def track(project_reports: dict[str, dict[str, str]]):
+def track():
     data = read_data()
     data["device_name"] = socket.gethostname()
 
@@ -136,6 +150,13 @@ def track(project_reports: dict[str, dict[str, str]]):
     i = 0
     last_state = None
     while True:
+        time.sleep(get_settings()["interval"] * 60)
+
+        project_reports = detect()
+        if not project_reports:
+            logging.info("Could not find any active projects tracked in JetBrains configs.")
+            continue
+
         state, project = get_active_jetbrains_project()
         current_state = f"{state} | Active Project: {project}" if project else state
 
@@ -151,17 +172,11 @@ def track(project_reports: dict[str, dict[str, str]]):
             sync(data)
             i = 0
 
-        time.sleep(get_settings()["interval"] * 60)
-
         i += 1
 
 
 if __name__ == "__main__":
     try:
-        project_reports = detect()
-        if project_reports:
-            track(project_reports)
-        else:
-            logging.info("Could not find any active projects tracked in JetBrains configs.")
+        track()
     except Exception as e:
         logging.error(e, exc_info=True)

@@ -11,7 +11,7 @@
     <header>
         <h1 class="title">Tempo</h1>
     </header>
-    <div class='full-page-bg'></div>
+    <div class="full-page-bg"></div>
 
     <div id="data" data-user='{{ data | tojson }}'></div>
 
@@ -19,68 +19,107 @@
         <a href="/" style="color: white; text-decoration: none;">Home</a>
     </button>
 
+    <script>
+        const allDatasets = JSON.parse(document.getElementById("data").dataset.user)["data_sets"];
+        const colours = ["#5aed97", "#5aedc7", "#5abedc", "#5a97dc", "#5a5edc", "#975aed", "#c75aed", "#dc5aed", "#dc5a97", "#dc5a5a"];
+        const showingBranches = Object.keys(allDatasets["week"]["data_sets"]);
+        let timeFrame = "week";
+
+        function flipBranch(branch) {
+            if (showingBranches.includes(branch)) {
+                showingBranches.splice(showingBranches.indexOf(branch), 1);
+            } else {
+                showingBranches.push(branch);
+            }
+        }
+
+        function updateChart() {
+            const L = chart.data.datasets.length;
+            for (let i = 0; i < L; i++) {
+                const d = chart.data.datasets.pop().borderColor;
+                if (!colours.includes(d)) colours.push(d);
+            }
+
+            chart.data.labels = JSON.parse(document.getElementById("data").dataset.user)["data_sets"][timeFrame]["labels"];
+
+            for (const branch of Object.keys(allDatasets[timeFrame]["data_sets"])) {
+                if (!showingBranches.includes(branch)) continue;
+                chart.data.datasets.push({
+                    label: branch,
+                    data: allDatasets[timeFrame]["data_sets"][branch],
+                    borderWidth: 2,
+                    borderColor: colours.length > 0 ? colours.pop() : "#5a97dc",
+                    tension: 0.2
+                });
+            }
+            chart.update();
+        }
+    </script>
+
     <main class="main">
         <div id="sidebar" class="sidebar">
             <ul id="list">
-                <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Branches:</a></li>
-                <li class="list-item"><a href="/" class="list-item">Overview</a></li>
+                <li class="list-item"><a class="list-item" style="font-size: 25px; color: #5aedc7">Languages:</a></li>
             </ul>
 
             <script>
-                const listParent = document.getElementById('list');
+                const listParent = document.getElementById("list");
 
-                const projectList = JSON.parse(document.getElementById("data").dataset.user)["project_list"];
-                const items = Object.keys(projectList);
+                const branches = JSON.parse(document.getElementById("data").dataset.user)["languages"];
 
-                items.forEach(itemText => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.textContent = itemText;
-                    a.href = "/project/" + itemText;
-                    a.style.color = "white";
-                    li.appendChild(a);
-                    li.classList.add('list-item');
+                branches.forEach(branch => {
+                    const li = document.createElement("li");
+                    const button = document.createElement("button");
+                    button.classList.add("side-button");
+                    button.textContent = branch;
+                    button.addEventListener("click", () => {
+                        flipBranch(branch);
+                        button.classList.toggle("pressed");
+                        updateChart();
+                        updateTimeInfo();
+                    });
+                    button.color = "white";
+                    li.appendChild(button);
+                    li.classList.add("list-item");
                     listParent.appendChild(li);
                 });
             </script>
         </div>
-        <script> document.getElementById('sidebar').style.height = listParent.clientHeight + 20 + 'px' </script>
+        <script> document.getElementById("sidebar").style.height = listParent.clientHeight + 20 + "px" </script>
 
-        <div id="graph" class="graph" style="padding: 0 10%">
+        <div id="graph" class="graph" style="padding: 0 2.5%">
+
+            <div><a id="title-a" class="top-info-text"></a></div>
+            <div><a id="top-a" class="top-info-text"></a></div>
+            <div><a id="middle-a" class="top-info-text"></a></div>
+            <div><a id="bottom-a" class="top-info-text"></a></div>
+
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
             <script>
-                const data = JSON.parse(document.getElementById('data').dataset.user);
-                const project_data = data["project_data"];
-                const labels = data["labels"];
+                const data = JSON.parse(document.getElementById("data").dataset.user);
 
-                Chart.defaults.color = '#FFFFFF';
+                Chart.defaults.color = "#FFFFFF";
 
-                const graphDiv = document.getElementById('graph');
+                const graphDiv = document.getElementById("graph");
 
-                const topInfoElement = document.createElement('a');
-                topInfoElement.classList.add('top-info-text');
-                topInfoElement.textContent = data["project"] + " - " + data["project_data"]["total"] + " minutes";
-                graphDiv.appendChild(topInfoElement);
-
-                const bottomInfoElement = document.createElement('a');
-                bottomInfoElement.classList.add('top-info-text');
-                bottomInfoElement.textContent = data["language"] + " - " + data["description"];
-                graphDiv.appendChild(bottomInfoElement);
-
-                const canvas = document.createElement('canvas');
+                const canvas = document.createElement("canvas");
+                canvas.id = "graph-canvas";
                 graphDiv.appendChild(canvas);
 
-                new Chart(canvas, {
-                    type: 'line',
+                let chart = new Chart(canvas, {
+                    type: "line",
                     data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'minutes',
-                            data: data["data_set"],
-                            borderWidth: 2,
-                            borderColor: '#5aedc7',
-                            tension: 0.2
-                        }]
+                        labels: allDatasets["week"]["labels"],
+                        datasets: Object.entries(allDatasets["week"]["data_sets"]).map(([b, d]) => {
+                            return {
+                                label: b,
+                                data: d,
+                                borderWidth: 2,
+                                borderColor: colours.length > 0 ? colours.pop() : "#5a97dc",
+                                tension: 0.2
+                            };
+                        })
                     },
                     options: {
                         scales: {
@@ -90,14 +129,82 @@
                         },
                         plugins: {
                             legend: {
-                                display: false
+                                display: true
                             }
                         }
                     }
                 });
             </script>
-
         </div>
+
+        <div class="time-info" id="time-info">
+            <ul id="time-list" style="margin: 0;">
+                <li class="list-item">
+                    <a class="list-item" style="font-size: 23px; color: #5a73ed">In the past</a>
+                    <a id="time-info-title" class="list-item" style="font-size: 23px; color: #5a73ed">week:</a>
+                </li>
+                <li class="list-item">
+                    <a class="list-item">Commits: </a>
+                    <a id="time-info-commits" class="list-item"></a>
+                </li>
+                <li class="list-item">
+                    <a class="list-item">Time spent: </a>
+                    <a id="time-info-time" class="list-item"></a>
+                </li>
+            </ul>
+        </div>
+        <script>
+            const frames = JSON.parse(document.getElementById("data").dataset.user)["time_frames"];
+
+            frames.forEach(time => {
+                const li = document.createElement("li");
+                const button = document.createElement("button");
+                button.classList.add("time-button");
+                const text = "1 " + time.charAt(0).toUpperCase() + time.slice(1)
+                button.textContent = text;
+                if (time === "week") button.classList.add("pressed");
+                button.addEventListener("click", () => {
+                    timeFrame = time;
+                    updateChart();
+                    button.classList.add("pressed");
+                    for (const btn of document.getElementsByClassName("time-button")) {
+                        if (btn.textContent !== text) btn.classList.remove("pressed");
+                    }
+                    document.getElementById("time-info-title").textContent = time + ":";
+                    updateTimeInfo();
+                });
+                button.color = "white";
+                li.appendChild(button);
+                li.classList.add("list-item");
+                document.getElementById("time-list").appendChild(li);
+            });
+
+            function updateTimeInfo() {
+                const frameInfo = data["info_per_time_frame"][timeFrame];
+
+                let d = 0;
+                chart.data.datasets.forEach(set => set.data.forEach(t => d += t));
+                document.getElementById("time-info-time").textContent = Math.floor(d / 60) + "h, " + d % 60 + "m";
+                let c = 0;
+                chart.data.datasets.forEach(set => {
+                    if (Object.keys(frameInfo["commit_nb"]).includes(set.label)) c += frameInfo["commit_nb"][set.label];
+                });
+                document.getElementById("time-info-commits").textContent = c.toString();
+
+                document.getElementById("title-a").textContent = "In the past " + timeFrame + ":";
+                document.getElementById("top-a").textContent = Math.floor(frameInfo["total_time"] / 60) + "h, "
+                    + frameInfo["total_time"] % 60 + "m, average of "
+                    + Math.floor(frameInfo["average_per_day"] / 60) + "h, " + frameInfo["average_per_day"] % 60 + "m per day";
+                document.getElementById("middle-a").textContent = frameInfo["project_nb"] + " projects worked on, "
+                    + frameInfo["total_commit_nb"] + " commits made";
+                document.getElementById("bottom-a").textContent = frameInfo["most_used_language"] + " was used the most, "
+                    + frameInfo["project_with_most_time"] + " was worked on the most";
+            }
+            updateTimeInfo();
+
+            document.getElementById("time-info").style.height = document.getElementById("time-list").clientHeight + 20 + "px";
+        </script>
+
     </main>
 
     <footer>

@@ -52,9 +52,7 @@
                     tension: 0.2
                 });
             }
-            console.log(chart.data.datasets);
             chart.update();
-            console.log(chart.data.datasets);
         }
     </script>
 
@@ -77,7 +75,6 @@
                     button.addEventListener("click", () => {
                         flipBranch(branch);
                         button.classList.toggle("pressed");
-                        //updateCommits();
                         updateChart();
                         updateTimeInfo();
                     });
@@ -123,10 +120,6 @@
                     afterDraw(chart, args, pluginOptions) {
                         chart.data.labels = JSON.parse(document.getElementById("data").dataset.user)["data_sets"][timeFrame]["labels"];
                         const xScale = chart.scales.x;
-                        console.log(chart.options.plugins.verticalLines);
-                        console.log(chart.data.labels);
-                        console.log(allDatasets[timeFrame]["labels"]);
-                        console.log(JSON.parse(document.getElementById("data").dataset.user)["data_sets"][timeFrame]["labels"]);
 
                         for (const pluginOption of pluginOptions) {
                             if (!xScale || pluginOption.index === undefined || pluginOption.index === null) {
@@ -135,7 +128,6 @@
 
                             const x = xScale.getPixelForValue(pluginOption.index) - 300;
                             const { ctx, chartArea } = chart;
-                            console.log(x);
 
                             ctx.save();
                             ctx.beginPath();
@@ -146,7 +138,6 @@
                             ctx.stroke();
 
                             if (pluginOption.label) {
-                                console.log(pluginOption.label);
                                 ctx.fillStyle = "#5aedc7";
                                 ctx.font = "10px comfortaa, sans-serif";
                                 ctx.textAlign = "left";
@@ -223,7 +214,6 @@
                 if (time === "week") button.classList.add("pressed");
                 button.addEventListener("click", () => {
                     timeFrame = time;
-                    //updateCommits();
                     updateChart();
                     button.classList.add("pressed");
                     for (const btn of document.getElementsByClassName("time-button")) {
@@ -241,7 +231,7 @@
             function updateTimeInfo() {
                 let d = 0;
                 chart.data.datasets.forEach(set => set.data.forEach(t => d += t));
-                document.getElementById("time-info-time").textContent = d.toString() + " min";
+                document.getElementById("time-info-time").textContent = Math.floor(d / 60) + "h, " + d % 60 + "m";
                 let c = 0;
                 chart.data.datasets.forEach(set => {
                     if (Object.keys(allDatasets[timeFrame]["commits"]).includes(set.label)) {
@@ -251,86 +241,6 @@
                 document.getElementById("time-info-commits").textContent = c.toString();
             }
             updateTimeInfo();
-
-            // const li = document.createElement("li");
-            // const checkBox = document.createElement("input");
-            // const checkLabel = document.createElement("label");
-            // checkBox.type = "checkbox";
-            // checkBox.checked = false;
-            // checkBox.id = "showCommits";
-            // checkLabel.classList.add("check");
-            // checkBox.classList.add("check");
-            // checkLabel.htmlFor = "showCommits";
-            // checkLabel.textContent = "Show commits";
-            // checkBox.addEventListener("change", () => {
-            //     updateCommits();
-            // });
-            //
-            // function updateCommits() {
-            //     console.log("Clicked");
-            //
-            //     let verticalLines = [];
-            //     if (checkBox.checked) {
-            //         const commitsInFrame = allDatasets[timeFrame]["commits"];
-            //         console.log(commitsInFrame);
-            //         chart.data.datasets.forEach(set => {
-            //             if (Object.keys(commitsInFrame).includes(set.label)) {
-            //                 for (const c of Object.keys(commitsInFrame[set.label])) {
-            //                     verticalLines.push({
-            //                         label: commitsInFrame[set.label][c]["message"],
-            //                         index: c,
-            //                     });
-            //                     console.log(c);
-            //                     console.log(commitsInFrame[set.label]);
-            //                 }
-            //             }
-            //         });
-            //     }
-            //
-            //     const L = chart.data.datasets.length;
-            //     for (let i = 0; i < L; i++) {
-            //         const d = chart.data.datasets.pop().borderColor;
-            //         if (!colours.includes(d)) colours.push(d);
-            //     }
-            //     chart.destroy();
-            //     chart = new Chart(canvas, {
-            //         type: "line",
-            //         data: {
-            //             labels: allDatasets[timeFrame]["labels"],
-            //             datasets: Object.entries(allDatasets[timeFrame]["data_sets"]).map(([b, d]) => {
-            //                 return {
-            //                     label: b,
-            //                     data: d,
-            //                     borderWidth: 2,
-            //                     borderColor: colours.length > 0 ? colours.pop() : "#5a97dc",
-            //                     tension: 0.2
-            //                 };
-            //             })
-            //         },
-            //         options: {
-            //             scales: {
-            //                 y: {
-            //                     beginAtZero: true
-            //                 }
-            //             },
-            //             plugins: {
-            //                 legend: {
-            //                     display: true
-            //                 },
-            //                 verticalLines: verticalLines
-            //             }
-            //         }
-            //     });
-            //
-            //     console.log(chart.options.plugins.verticalLines);
-            //     chart.update();
-            //     console.log(chart.options.plugins.verticalLines);
-            // }
-            //
-            // li.appendChild(checkBox);
-            // li.appendChild(checkLabel);
-            // li.classList.add("list-item");
-            // document.getElementById("time-list").appendChild(li);
 
             document.getElementById("time-info").style.height = document.getElementById("time-list").clientHeight + 20 + "px";
         </script>
