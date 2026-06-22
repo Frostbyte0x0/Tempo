@@ -75,5 +75,41 @@
       }
     },
     "device_name": "NasaComputer"
+  },
+  "MSI": {
+    "Tempo": {
+      "total": 329.0,
+      "per_branch": {
+        "master": {
+          "total": 329.0,
+          "06/01/26 12h": 10,
+          "06/03/26 18h": 305,
+          "06/19/26 23h": 2.0,
+          "06/20/26 00h": 0.5,
+          "06/20/26 10h": 5.0,
+          "06/21/26 19h": 3.5,
+          "06/21/26 20h": 3.0
+        }
+      }
+    },
+    "InverseKinematics": {
+      "total": 5,
+      "per_branch": {
+        "master": {
+          "total": 5,
+          "06/01/26 12h": 5
+        }
+      }
+    },
+    "Resonance": {
+      "total": 5,
+      "per_branch": {
+        "main": {
+          "total": 5,
+          "06/01/26 12h": 5
+        }
+      }
+    },
+    "device_name": "MSI"
   }
 }

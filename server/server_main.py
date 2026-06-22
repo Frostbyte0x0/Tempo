@@ -1,8 +1,8 @@
 import json
 import logging
 import socket
-import struct
 import sys
+from datetime import datetime, timedelta
 
 import github_profile_updater
 
@@ -10,6 +10,13 @@ import github_profile_updater
 def get_settings() -> dict:
     with open("settings.json", "r") as f:
         return json.load(f)
+
+def write_setting(key: str, value):
+    with open("settings.json", "r") as f:
+        settings = json.load(f)
+    settings[key] = value
+    with open("settings.json", "w") as f:
+        json.dump(settings, f, indent=2)
 
 # noinspection PyArgumentList
 logging.basicConfig(
@@ -51,9 +58,7 @@ def wait_and_manage_connection():
             c, addr = s.accept()
             logging.info(f"Connection established from {addr}")
 
-            is_project_list = struct.unpack('?', c.recv(1))[0]
-
-            received = c.recv(1024)
+            received = c.recv(1024*32)
 
             if received:
                 new_data = json.loads(received.decode("utf-8"))
@@ -61,20 +66,19 @@ def wait_and_manage_connection():
                 logging.info(f"Received data from {device_name}")
                 new_data.pop("device_name")
 
-                if is_project_list:
-                    project_list = read_project_list()
-                    project_list[device_name] = new_data
-                    write_project_list(project_list)
-                    logging.info(f"Wrote project list to {device_name}")
+                project_list = read_project_list()
+                project_list[device_name] = new_data["project_list"]
+                write_project_list(project_list)
+                logging.info(f"Wrote project list to {device_name}")
 
-                else:
-                    data = read_data()
-                    data[device_name] = new_data
-                    write_data(data)
-                    logging.info(f"Wrote data to {device_name}")
-                    if get_settings()["auto_sync_github"]:
-                        logging.info(f"Updating github profile")
-                        github_profile_updater.update_profile()
+                data = read_data()
+                data[device_name] = new_data["data"]
+                write_data(data)
+                logging.info(f"Wrote data to {device_name}")
+                if get_settings()["auto_sync_github"] and datetime.now() - datetime.strptime(get_settings()["last_update"], "%Y-%m-%d %H:%M:%S") > timedelta(hours=int(get_settings()["sync_delay"])):
+                    logging.info(f"Updating github profile")
+                    github_profile_updater.update_profile()
+                    write_setting("last_update", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
             c.close()
     finally:

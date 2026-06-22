@@ -1,5 +1,7 @@
 {
   "logging_level": 10,
   "log_file": "server.log",
-  "auto_sync_github": true
+  "auto_sync_github": true,
+  "sync_delay": 24,
+  "last_update": "2024-06-01 00:00:00"
 }

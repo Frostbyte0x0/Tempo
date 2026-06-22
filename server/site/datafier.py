@@ -102,8 +102,11 @@ def get_time_in_day(projects: dict, labels: list, hours: int) -> dict[str, list[
             day = date_key.split(" ")[0]
             hour = str(math.ceil(int(date_key.split(" ")[1][:-1]) / hours) * hours)
             if len(hour) == 1: hour = "0" + hour
+            extra_day = hour == "24"
+            if extra_day: hour = "00"
 
-            key = (datetime.strptime(day + " " + hour, "%m/%d/%y %H") + timedelta(hours=int(datetime.now().strftime("%H")) % 2)).strftime("%D %Hh")
+            key = (datetime.strptime(day + " " + hour, "%m/%d/%y %H") +
+                   timedelta(hours=int(datetime.now().strftime("%H")) % 2 + 24 if extra_day else 0)).strftime("%D %Hh")
             if key in result_data.keys():
                 result_data[key] += data
 

@@ -1,30 +1,11 @@
 import json
+import logging
 import socket
-import struct
 import sys
 import time
 
 from project_lister import get_active_projects_with_git
 from scanner import get_active_jetbrains_project
-import logging
-
-
-# TODO:
-# - Commands
-#   - Client
-#     - Run
-#     - Stop
-#     - Is running
-#     - Try sync
-#     - Change settings
-#   - Server
-#     - Run
-#     - Stop
-#     - Is running
-#   - Website
-#     - Run
-#     - Stop
-#     - Is running
 
 
 def get_settings() -> dict:
@@ -105,17 +86,17 @@ def detect() -> dict[str, dict[str, str]] | None:
     if project_reports:
         write_project_list(project_reports)
 
-        for idx, report in enumerate(project_reports.values(), 1):
-            logging.info(f"--- [Active Project #{idx}] ---")
-            logging.info(f"Target IDE:    {report['ide']}")
-            logging.info(f"Project Name:  {report['project_name']}")
-            logging.info(f"Local Path:    {report['local_path']}")
-            logging.info(f"Git Status:    {report['status']}")
-            if report['branch']:
-                logging.info(f"Active Branch: {report['branch']}")
-            if report['remote_url']:
-                logging.info(f"Remote URL:    {report['remote_url']}")
-            logging.info("----------------------------")
+        # for idx, report in enumerate(project_reports.values(), 1):
+        #     logging.info(f"--- [Active Project #{idx}] ---")
+        #     logging.info(f"Target IDE:    {report['ide']}")
+        #     logging.info(f"Project Name:  {report['project_name']}")
+        #     logging.info(f"Local Path:    {report['local_path']}")
+        #     logging.info(f"Git Status:    {report['status']}")
+        #     if report['branch']:
+        #         logging.info(f"Active Branch: {report['branch']}")
+        #     if report['remote_url']:
+        #         logging.info(f"Remote URL:    {report['remote_url']}")
+        #     logging.info("----------------------------")
 
         return project_reports
     else:
@@ -123,14 +104,12 @@ def detect() -> dict[str, dict[str, str]] | None:
     return None
 
 
-def sync(data: dict, is_project_list:bool = False):
+def sync(data: dict):
     logging.debug("Syncing data")
     c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
         c.connect(("localhost", 8080))
-        c.sendall(struct.pack('?', is_project_list))
-
         message = json.dumps(data)
         c.sendall(message.encode('utf-8'))
     except ConnectionRefusedError:
@@ -141,11 +120,10 @@ def sync(data: dict, is_project_list:bool = False):
 
 def track():
     data = read_data()
-    data["device_name"] = socket.gethostname()
 
     project_list = read_project_list()
     project_list["device_name"] = socket.gethostname()
-    sync(project_list, True)
+    sync({"project_list": project_list, "data": data, "device_name": socket.gethostname()})
 
     i = 0
     last_state = None
@@ -165,11 +143,14 @@ def track():
             last_state = current_state
 
         if project:
-            increase_time(data, project, project_reports[project]["branch"])
-            write_data(data)
+            try:
+                increase_time(data, project, project_reports[project]["branch"])
+                write_data(data)
+            except KeyError:
+                logging.error(f"Project {project} not found in project list.")
 
         if i % get_settings()["sync_intervals"] == 0:
-            sync(data)
+            sync({"project_list": project_list, "data": data, "device_name": socket.gethostname()})
             i = 0
 
         i += 1
